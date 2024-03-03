@@ -31,9 +31,10 @@ namespace MikuMikuWorld
 		MultiInputBinding nextTick = { "next_tick", {ImGuiKey_UpArrow} };
 		MultiInputBinding create = { "new_chart", {ImGuiKey_N, ImGuiModFlags_Ctrl} };
 		MultiInputBinding open = { "open", {ImGuiKey_O, ImGuiModFlags_Ctrl} };
-		MultiInputBinding save = { "save", {ImGuiKey_S, ImGuiModFlags_Ctrl} };
-		MultiInputBinding saveAs = { "save_as", {ImGuiKey_S, ImGuiModFlags_Ctrl | ImGuiModFlags_Shift} };
-		MultiInputBinding exportSus = { "export", {ImGuiKey_E, ImGuiModFlags_Ctrl} };
+		MultiInputBinding save = { "save", {ImGuiKey_E, ImGuiModFlags_Ctrl} };
+		MultiInputBinding saveAs = { "save_as", {ImGuiKey_E, ImGuiModFlags_Ctrl | ImGuiModFlags_Shift} };
+		MultiInputBinding exportSus = { "export", {ImGuiKey_S, ImGuiModFlags_Ctrl | ImGuiModFlags_Shift} };
+		MultiInputBinding trySaveSus = { "save_Sus", {ImGuiKey_S, ImGuiModFlags_Ctrl} };
 		MultiInputBinding selectAll = { "select_all", {ImGuiKey_A, ImGuiModFlags_Ctrl} };
 		MultiInputBinding undo = { "undo", {ImGuiKey_Z, ImGuiModFlags_Ctrl} };
 		MultiInputBinding redo = { "redo", {ImGuiKey_Y, ImGuiModFlags_Ctrl} };
@@ -116,6 +117,7 @@ namespace MikuMikuWorld
 		&config.input.open,
 		&config.input.save,
 		&config.input.saveAs,
+		&config.input.trySaveSus,
 		&config.input.exportSus,
 		&config.input.undo,
 		&config.input.redo,
