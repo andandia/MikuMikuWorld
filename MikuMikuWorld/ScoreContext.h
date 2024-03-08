@@ -32,6 +32,7 @@ namespace MikuMikuWorld
 		std::string designer{};
 		std::string artist{};
 		std::string filename{};
+		std::string susfilename{};
 		std::string musicFilename{};
 		float musicOffset{};
 		Jacket jacket{};

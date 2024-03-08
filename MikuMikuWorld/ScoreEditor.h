@@ -39,8 +39,8 @@ namespace MikuMikuWorld
 		void exportSus();
 		bool saveAs();
 		bool trySave(std::string);
-		bool trySaveSus(std::string);
-		bool saveSus(std::string filename);
+		bool trySaveSus(std::string, std::string);
+		bool saveSus(std::string filename); 
 		void autoSave();
 		int deleteOldAutoSave(int count);
 
