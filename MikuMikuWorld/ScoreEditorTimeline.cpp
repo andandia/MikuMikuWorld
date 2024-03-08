@@ -990,6 +990,17 @@ namespace MikuMikuWorld
 		currentMode = mode;
 	}
 
+
+	void ScoreEditorTimeline::changeModeToggle(EditArgs& edit)//note
+	{
+		if (currentMode != TimelineMode::Select) {
+			beforecurrentMode = currentMode;
+			changeMode(TimelineMode::Select, edit);
+		} else {
+			changeMode(beforecurrentMode, edit);
+		}
+	}
+
 	int ScoreEditorTimeline::findClosestHold(ScoreContext& context, int lane, int tick)
 	{
 		float xt = laneToPosition(lane);

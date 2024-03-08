@@ -70,6 +70,7 @@ namespace MikuMikuWorld
 		float visualOffset{};
 		float scrollStartY{};
 		float zoom = 1.0f;
+		TimelineMode beforecurrentMode{ TimelineMode::Select };
 
 		static constexpr float unitHeight = 0.15f;
 		static constexpr float scrollUnit = 50;
@@ -245,6 +246,7 @@ namespace MikuMikuWorld
 
 		constexpr inline TimelineMode getMode() const { return currentMode; }
 		void changeMode(TimelineMode mode, EditArgs& edit);
+		void changeModeToggle(EditArgs& edit);
 
 		constexpr inline float getPlaybackSpeed() const { return playbackSpeed; }
 		void setPlaybackSpeed(ScoreContext& context, float speed);

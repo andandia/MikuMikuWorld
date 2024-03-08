@@ -110,4 +110,8 @@ namespace ImGui
 
 	bool IsAnyDown(const MultiInputBinding& binding);
 	bool IsAnyPressed(const MultiInputBinding& binding, bool repeat = false);
+
+	bool IsReleased(const InputBinding& binding, bool repeat = false);
+	bool IsAnyReleased(const MultiInputBinding& binding, bool repeat = false);
+
 }

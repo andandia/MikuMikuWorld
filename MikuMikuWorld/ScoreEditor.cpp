@@ -118,6 +118,9 @@ namespace MikuMikuWorld
 
 			for (int i = 0; i < (int)TimelineMode::TimelineModeMax; ++i)
 				if (ImGui::IsAnyPressed(*timelineModeBindings[i])) timeline.changeMode((TimelineMode)i, edit);
+
+			if (ImGui::IsAnyPressed(config.input.timelineToggle)) timeline.changeModeToggle(edit);
+			if (ImGui::IsAnyReleased(config.input.timelineToggle)) timeline.changeModeToggle(edit);
 		}
 
 		timeline.laneWidth = config.timelineWidth;

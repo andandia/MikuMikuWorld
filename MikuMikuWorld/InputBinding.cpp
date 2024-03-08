@@ -304,4 +304,20 @@ namespace ImGui
 
 		return false;
 	}
+
+	bool IsReleased(const InputBinding& binding, bool repeat)
+	{
+		return ImGui::TestModifiers((ImGuiModFlags_)binding.keyModifiers) && ImGui::IsKeyReleased((ImGuiKey)binding.keyCode, repeat);
+	}
+
+	bool IsAnyReleased(const MultiInputBinding& bindings, bool repeat)
+	{
+		for (int i = 0; i < bindings.count; ++i)
+			if (IsReleased(bindings.bindings[i], repeat))
+				return true;
+
+		return false;
+	}
+
+
 }

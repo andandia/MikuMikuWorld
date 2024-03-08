@@ -53,6 +53,8 @@ namespace MikuMikuWorld
 		MultiInputBinding timelineBpm = { "timeline_bpm", {ImGuiKey_8}, {ImGuiKey_Keypad8} };
 		MultiInputBinding timelineTimeSignature = { "timeline_time_signature", {ImGuiKey_9}, {ImGuiKey_Keypad9} };
 		MultiInputBinding timelineHiSpeed = { "timeline_hi_speed", {ImGuiKey_0}, {ImGuiKey_Keypad0} };
+
+		MultiInputBinding timelineToggle = { "timeline_toggle", {ImGuiKey_E} };
 	};
 
 	constexpr size_t maxRecentFilesEntries = 10;
@@ -157,6 +159,7 @@ namespace MikuMikuWorld
 		&config.input.timelineBpm,
 		&config.input.timelineTimeSignature,
 		&config.input.timelineHiSpeed,
+		&config.input.timelineToggle,
 
 		&config.input.openHelp,
 		&config.input.openSettings,
