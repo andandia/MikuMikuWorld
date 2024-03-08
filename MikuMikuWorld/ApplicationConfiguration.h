@@ -40,6 +40,7 @@ namespace MikuMikuWorld
 		MultiInputBinding redo = { "redo", {ImGuiKey_Y, ImGuiModFlags_Ctrl} };
 		MultiInputBinding zoomOut = { "zoom_out", {} };
 		MultiInputBinding zoomIn = { "zoom_in", {} };
+		MultiInputBinding returnToLastSelectedTickOnPause = { "return_to_last_tick", {ImGuiKey_T} };
 
 		MultiInputBinding timelineSelect = { "timeline_select", {ImGuiKey_1}, {ImGuiKey_Keypad1} };
 		MultiInputBinding timelineTap = { "timeline_tap", {ImGuiKey_2}, {ImGuiKey_Keypad2} };
@@ -143,6 +144,7 @@ namespace MikuMikuWorld
 		&config.input.increaseNoteSize,
 		&config.input.zoomOut,
 		&config.input.zoomIn,
+		&config.input.returnToLastSelectedTickOnPause,
 
 		&config.input.timelineSelect,
 		&config.input.timelineTap,

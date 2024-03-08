@@ -108,6 +108,7 @@ namespace MikuMikuWorld
 			if (ImGui::IsAnyPressed(config.input.redo)) context.redo();
 			if (ImGui::IsAnyPressed(config.input.zoomOut, true)) timeline.setZoom(timeline.getZoom() - 0.25f);
 			if (ImGui::IsAnyPressed(config.input.zoomIn, true)) timeline.setZoom(timeline.getZoom() + 0.25f);
+			if (ImGui::IsAnyPressed(config.input.returnToLastSelectedTickOnPause)) config.returnToLastSelectedTickOnPause = !config.returnToLastSelectedTickOnPause;
 			if (ImGui::IsAnyPressed(config.input.decreaseNoteSize, true)) edit.noteWidth = std::clamp(edit.noteWidth - 1, MIN_NOTE_WIDTH, MAX_NOTE_WIDTH);
 			if (ImGui::IsAnyPressed(config.input.increaseNoteSize, true)) edit.noteWidth = std::clamp(edit.noteWidth + 1, MIN_NOTE_WIDTH, MAX_NOTE_WIDTH);
 			if (ImGui::IsAnyPressed(config.input.shrinkDown)) context.shrinkSelection(Direction::Down);
@@ -549,7 +550,7 @@ namespace MikuMikuWorld
 		{
 			ImGui::MenuItem(getString("show_step_outlines"), NULL, &timeline.drawHoldStepOutlines);
 			ImGui::MenuItem(getString("cursor_auto_scroll"), NULL, &config.followCursorInPlayback);
-			ImGui::MenuItem(getString("return_to_last_tick"), NULL, &config.returnToLastSelectedTickOnPause);
+			ImGui::MenuItem(getString("return_to_last_tick"), ToShortcutString(config.input.returnToLastSelectedTickOnPause), &config.returnToLastSelectedTickOnPause);
 			ImGui::MenuItem(getString("draw_waveform"), NULL, &config.drawWaveform);
 
 			ImGui::EndMenu();
