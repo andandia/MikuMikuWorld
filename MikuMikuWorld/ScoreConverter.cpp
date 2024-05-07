@@ -472,6 +472,7 @@ namespace MikuMikuWorld
 		metadata.data["title"] = score.metadata.title;
 		metadata.data["artist"] = score.metadata.artist;
 		metadata.data["designer"] = score.metadata.author;
+		metadata.data["wave"] = score.metadata.musicFile;
 		metadata.requests.push_back("ticks_per_beat 480");
 
 		// milliseconds -> seconds
