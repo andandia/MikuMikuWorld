@@ -125,6 +125,11 @@ title, タイトル
 designer, 譜面作者
 artist, アーティスト
 jacket, ジャケット
+genre, ジャンル
+level, レベル
+movie_offset, 動画オフセット
+movie_name, 動画ファイル名
+islong, ロング曲フラグ
 audio, 音源
 music_file, 音源ファイル
 music_offset, オフセット
@@ -194,5 +199,6 @@ timeline_guide, タイムライン「ガイド」
 timeline_bpm, タイムライン「BPM」
 timeline_time_signature, タイムライン「拍子」
 timeline_hi_speed, タイムライン「ハイスピード」
+timeline_toggle, タイムライン「選択に一時切り替え」
 zoom_in, ズームイン
 zoom_out, ズームアウト

@@ -5,6 +5,7 @@
 #include "IO.h"
 #include "Constants.h"
 #include <unordered_set>
+#include <algorithm>
 
 using namespace IO;
 
@@ -73,6 +74,18 @@ namespace MikuMikuWorld
 		metadata.title = reader->readString();
 		metadata.author = reader->readString();
 		metadata.artist = reader->readString();
+		metadata.genre = reader->readString();
+		metadata.level = std::stoi(reader->readString());
+		metadata.movie_name = reader->readString();
+		metadata.movie_offset = std::stof(reader->readString());
+
+		//•¶Žš—ñ‚©‚çbool‚Ö
+		std::string lowerStr = reader->readString();
+		std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+		bool islong = (lowerStr == "true" || lowerStr == "1");
+
+		metadata.islong = islong;
 		metadata.musicFile = reader->readString();
 		metadata.musicOffset = reader->readSingle();
 
@@ -87,6 +100,11 @@ namespace MikuMikuWorld
 		writer->writeString(metadata.title);
 		writer->writeString(metadata.author);
 		writer->writeString(metadata.artist);
+		writer->writeString(metadata.genre);
+		writer->writeString(std::to_string(metadata.level));
+		writer->writeString(metadata.movie_name);
+		writer->writeString(std::to_string(metadata.movie_offset));
+		writer->writeString(std::to_string(metadata.islong));
 		writer->writeString(metadata.musicFile);
 		writer->writeSingle(metadata.musicOffset);
 		writer->writeString(metadata.jacketFile);

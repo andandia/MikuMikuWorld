@@ -16,6 +16,11 @@ namespace MikuMikuWorld
 			UI::addStringProperty(getString("title"), context.workingData.title);
 			UI::addStringProperty(getString("designer"), context.workingData.designer);
 			UI::addStringProperty(getString("artist"), context.workingData.artist);
+			UI::addStringProperty(getString("genre"), context.workingData.genre);
+			UI::addIntProperty(getString("level"), context.workingData.level);
+			UI::addStringProperty(getString("movie_name"), context.workingData.movie_name);
+			UI::addFloatProperty(getString("movie_offset"), context.workingData.movie_offset, "%g");
+			UI::addCheckboxProperty(getString("islong"), context.workingData.islong);
 
 			std::string jacketFile = context.workingData.jacket.getFilename();
 			int result = UI::addFileProperty(getString("jacket"), jacketFile);

@@ -35,11 +35,22 @@ namespace MikuMikuWorld
 
 	Score ScoreConverter::susToScore(const SUS& sus)
 	{
+		//•¶Žš—ñ‚©‚çbool‚Ö
+		std::string lowerStr = sus.metadata.data.at("islong");
+		std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+		bool islong =(lowerStr == "true" || lowerStr == "1");
+
 		ScoreMetadata metadata
 		{
 			sus.metadata.data.at("title"),
 			sus.metadata.data.at("artist"),
 			sus.metadata.data.at("designer"),
+			sus.metadata.data.at("genre"),
+			std::stoi(sus.metadata.data.at("level")),
+			sus.metadata.data.at("movie_name"),
+			std::stof(sus.metadata.data.at("movie_offset")),
+			islong,
 			"",
 			"",
 			sus.metadata.waveOffset * 1000 // seconds -> milliseconds
@@ -473,6 +484,11 @@ namespace MikuMikuWorld
 		metadata.data["artist"] = score.metadata.artist;
 		metadata.data["designer"] = score.metadata.author;
 		metadata.data["wave"] = score.metadata.musicFile;
+		metadata.data["genre"] = score.metadata.genre;
+		metadata.data["level"] = std::to_string(score.metadata.level);
+		metadata.data["movieName"] = score.metadata.movie_name;
+		metadata.data["movieOffset"] = std::to_string(score.metadata.movie_offset);
+		metadata.data["islong"] = std::to_string(score.metadata.islong);
 		metadata.requests.push_back("ticks_per_beat 480");
 
 		// milliseconds -> seconds

@@ -31,6 +31,11 @@ namespace MikuMikuWorld
 		std::string title{};
 		std::string designer{};
 		std::string artist{};
+		std::string genre{};
+		int level{};
+		std::string movie_name{};
+		std::float_t movie_offset{};
+		bool islong{};
 		std::string filename{};
 		std::string susfilename{};
 		std::string musicFilename{};
@@ -40,6 +45,8 @@ namespace MikuMikuWorld
 		EditorScoreData() {}
 		EditorScoreData(const ScoreMetadata& metadata, const std::string& filename) :
 			title{ metadata.title }, designer{ metadata.author }, artist{ metadata.artist },
+			genre{ metadata.genre }, level{ metadata.level }, movie_name{ metadata.movie_name },
+			movie_offset{ metadata.movie_offset }, islong{ metadata.islong },
 			musicFilename{ metadata.musicFile }, musicOffset{ metadata.musicOffset }
 		{
 			this->filename = filename;
@@ -48,7 +55,8 @@ namespace MikuMikuWorld
 
 		ScoreMetadata toScoreMetadata() const
 		{
-			return { title, artist, designer, musicFilename, jacket.getFilename(), musicOffset };
+			return { title, artist, designer, genre, level, movie_name, movie_offset, islong,
+				musicFilename, jacket.getFilename(), musicOffset };
 		}
 	};
 

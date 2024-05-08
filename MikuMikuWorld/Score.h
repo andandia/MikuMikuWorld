@@ -33,6 +33,11 @@ namespace MikuMikuWorld
 		std::string title;
 		std::string artist;
 		std::string author;
+		std::string genre{};
+		int level{};
+		std::string movie_name;
+		std::float_t movie_offset{};
+		bool islong{};
 		std::string musicFile;
 		std::string jacketFile;
 		float musicOffset;
