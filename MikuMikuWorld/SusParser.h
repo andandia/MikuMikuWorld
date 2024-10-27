@@ -28,6 +28,11 @@ namespace MikuMikuWorld
 		std::string title;
 		std::string artist;
 		std::string designer;
+		std::string genre;
+		std::string islong;
+		std::string level = "0";
+		std::string movie_name;
+		std::string movie_offset = "0";
 		std::unordered_map<std::string, float> bpmDefinitions;
 		std::vector<Bar> bars;
 

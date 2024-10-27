@@ -75,10 +75,25 @@ namespace MikuMikuWorld
 		metadata.author = reader->readString();
 		metadata.artist = reader->readString();
 		metadata.genre = reader->readString();
-		metadata.level = std::stoi(reader->readString());
+		try
+		{
+			metadata.level = std::stoi(reader->readString());
+		}
+		catch (const std::exception&)
+		{
+			metadata.level = 0;
+		}
 		metadata.movie_name = reader->readString();
-		metadata.movie_offset = std::stof(reader->readString());
 
+		try
+		{
+			metadata.movie_offset = std::stof(reader->readString());
+		}
+		catch (const std::exception&)
+		{
+			metadata.movie_offset = 0;
+		}
+		
 		//•¶Žš—ñ‚©‚çbool‚Ö
 		std::string lowerStr = reader->readString();
 		std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),

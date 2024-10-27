@@ -213,7 +213,7 @@ namespace MikuMikuWorld
 		// Exclude double quotes around the value
 		if (startsWith(value, "\"") && endsWith(value, "\""))
 			value = value.substr(1, value.size() - 2);
-
+		
 		if (key == "TITLE")
 			title = value;
 		else if (key == "ARTIST")
@@ -224,6 +224,21 @@ namespace MikuMikuWorld
 			waveOffset = atof(value.c_str());
 		else if (key == "MEASUREBS")
 			measureOffset = atoi(value.c_str());
+		else if (key == "genre") {
+			genre = value;
+		}
+		else if (key == "islong") {
+			islong = value;
+		}
+		else if (key == "level") {
+			level = value;
+		}
+		else if (key == "movie_name") {
+			movie_name = value;
+		}
+		else if (key == "movie_offset") {
+			movie_offset = value;
+		}
 		else if (key == "REQUEST")
 		{
 			std::vector<std::string> requestArgs = split(value, " ");
@@ -344,6 +359,11 @@ namespace MikuMikuWorld
 		sus.metadata.data["artist"] = artist;
 		sus.metadata.data["designer"] = designer;
 		sus.metadata.waveOffset = waveOffset;
+		sus.metadata.data["genre"] = genre;
+		sus.metadata.data["islong"] = islong;
+		sus.metadata.data["level"] = level;
+		sus.metadata.data["movie_name"] = movie_name;
+		sus.metadata.data["movie_offset"] = movie_offset;
 
 		return sus;
 	}
