@@ -11,6 +11,12 @@
 
 namespace MikuMikuWorld
 {
+	// デバッグ出力用の関数
+	void DebugPrint(const char* message) {
+		OutputDebugStringA(message);
+	}
+
+
 	bool eventControl(float xPos, Vector2 pos, ImU32 color, const char* txt, bool enabled)
 	{
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -99,6 +105,62 @@ namespace MikuMikuWorld
 				offset = cursorY + timelineOffset;
 		}
 	}
+
+	/// <summary>
+	/// 座標がレーン内にあるかどうかを判定します
+	/// </summary>
+	/// <param name="note"></param>
+	/// <param name="offsetTicks"></param>
+	/// <returns></returns>
+	bool ScoreEditorTimeline::checkPosInsideLane(ImVec2 position, ImVec2 clickPos) const
+	{
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+		// 各レーンの線を描画
+		int firstLaneX = -1; // 最初の線のX座標
+		int lastLaneX = -1;  // 最後の線のX座標
+
+		for (int l = 0; l <= NUM_LANES; ++l)
+		{
+			const int x = position.x + laneToPosition(l);
+
+			// 最初の線のX座標を取得
+			if (l == 0) {
+				firstLaneX = x;
+			}
+
+			// 最後の線のX座標を取得
+			if (l == NUM_LANES) {
+				lastLaneX = x;
+			}
+		}
+
+		// デバッグ用：最初と最後の線を赤色で描画
+		//DebugPrint(("posx " + std::to_string(position.x) + ", posy " + std::to_string(position.y) + "\r\n" ).c_str() );
+		// 
+		//if (firstLaneX != -1 && lastLaneX != -1) {
+		//	const ImU32 redColor = IM_COL32(255, 0, 0, 255); // 赤色
+		//	const float lineThickness = 2.0f; // 線の太さ
+
+		//	// 最初の線を描画
+		//	drawList->AddLine(ImVec2(firstLaneX, position.y), ImVec2(firstLaneX, position.y + size.y), redColor, lineThickness);
+
+		//	// 最後の線を描画
+		//	drawList->AddLine(ImVec2(lastLaneX, position.y), ImVec2(lastLaneX, position.y + size.y), redColor, lineThickness);
+		//}
+
+
+		if (clickPos.x >= firstLaneX && clickPos.x <= lastLaneX)
+		{
+			return true;
+		}
+		else 
+		{
+			return false;
+		}
+	}
+
 
 	void ScoreEditorTimeline::updateScrollbar()
 	{
@@ -284,6 +346,11 @@ namespace MikuMikuWorld
 		position = ImGui::GetCursorScreenPos();
 		boundaries = ImRect(position, position + size);
 		mouseInTimeline = ImGui::IsMouseHoveringRect(position, position + size);
+		// クリック位置がレーン内かをチェック
+		if (ImGui::IsMouseClicked(0))
+		{
+			isPosInsideLane = checkPosInsideLane(position, ImGui::GetMousePos());
+		}
 
 		laneOffset = (size.x * 0.5f) - ((NUM_LANES * laneWidth) * 0.5f);
 		minOffset = size.y - 50;
@@ -398,6 +465,7 @@ namespace MikuMikuWorld
 			drawWaveform(context);
 
 		// Draw lanes
+		//各レーンの線を描画
 		for (int l = 0; l <= NUM_LANES; ++l)
 		{
 			const int x = position.x + laneToPosition(l);
@@ -543,12 +611,26 @@ namespace MikuMikuWorld
 
 		// Update cursor tick after determining whether a note is hovered
 		// The cursor tick should not change if a note is hovered
+		// クリックしたときに再生位置変更(選択モード時)
 		if (ImGui::IsMouseClicked(0) && !isHoveringNote && mouseInTimeline && !playing && !pasting &&
 			!UI::isAnyPopupOpen() && currentMode == TimelineMode::Select && ImGui::IsWindowFocused())
 		{
 			context.currentTick = hoverTick;
 			lastSelectedTick = context.currentTick;
 		}
+
+
+		// クリックしたときに再生位置変更(選択モード以外)
+		if (ImGui::IsMouseClicked(0) && !isHoveringNote && !playing && !pasting &&
+			!UI::isAnyPopupOpen() 
+			&& currentMode != TimelineMode::Select
+			&& ImGui::IsWindowFocused()
+			&& !isPosInsideLane)
+		{
+			context.currentTick = hoverTick;
+			lastSelectedTick = context.currentTick;
+		}
+
 
 		// Selection boxes
 		for (int id : context.selectedNotes)
@@ -766,11 +848,13 @@ namespace MikuMikuWorld
 		}
 
 		if (mouseInTimeline && !isHoldingNote && currentMode != TimelineMode::Select &&
-			!pasting && !playing && !UI::isAnyPopupOpen())
+			!pasting && !playing && isPosInsideLane && !UI::isAnyPopupOpen())
 		{
 			previewInput(edit, renderer);
-			if (ImGui::IsMouseClicked(0) && hoverTick >= 0 && !isHoveringNote)
+			if (ImGui::IsMouseClicked(0) && hoverTick >= 0 && !isHoveringNote) 
+			{
 				executeInput(context, edit);
+			}
 
 			if (insertingHold && !ImGui::IsMouseDown(0))
 			{
@@ -936,6 +1020,12 @@ namespace MikuMikuWorld
 		}
 	}
 
+
+	/// <summary>
+	/// ノーツ類の配置メイン処理
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="edit"></param>
 	void ScoreEditorTimeline::executeInput(ScoreContext& context, EditArgs& edit)
 	{
 		switch (currentMode)
@@ -1913,6 +2003,11 @@ namespace MikuMikuWorld
 		return std::max(tick - (tick % (TICKS_PER_BEAT / (division / 4))), 0);
 	}
 
+	/// <summary>
+	/// ノートの配置処理
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="edit"></param>
 	void ScoreEditorTimeline::insertNote(ScoreContext& context, EditArgs& edit)
 	{
 		Score prev = context.score;

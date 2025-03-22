@@ -115,6 +115,7 @@ namespace MikuMikuWorld
 		ImVec2 prevPos;
 		ImVec2 prevSize;
 		ImRect boundaries;
+		bool isPosInsideLane{ false };
 
 		ImVec2 ctrlMousePos;
 		ImVec2 dragStart;
@@ -243,6 +244,7 @@ namespace MikuMikuWorld
 		void nextTick(ScoreContext& context);
 		int roundTickDown(int tick, int division);
 		void focusCursor(ScoreContext& context, Direction direction);
+		bool checkPosInsideLane(ImVec2 position, ImVec2 clickPos) const;
 
 		constexpr inline TimelineMode getMode() const { return currentMode; }
 		void changeMode(TimelineMode mode, EditArgs& edit);
