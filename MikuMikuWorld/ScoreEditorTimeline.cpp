@@ -813,6 +813,15 @@ namespace MikuMikuWorld
 			}
 		}
 
+		//選択時に中央クリックでノーツ削除
+		if (ImGui::IsMouseClicked(2) && !UI::isAnyPopupOpen())
+		{
+			if (!context.selectedNotes.empty())
+			{
+				context.deleteSelection();
+			}
+		}
+
 		for (auto& [id, hold] : context.score.holdNotes)
 		{
 			Note& start = context.score.notes.at(hold.start.ID);
