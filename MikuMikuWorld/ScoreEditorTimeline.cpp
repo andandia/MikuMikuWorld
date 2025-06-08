@@ -1323,6 +1323,45 @@ namespace MikuMikuWorld
 		pos.x += noteControlWidth;
 		sz.x = (laneWidth * note.width) + 4.0f - (noteControlWidth * 2.0f);
 
+
+		//数字キーでリサイズ
+		for (int i = 1; i <= 9; ++i)
+		{
+			// ImGuiKey_Alpha1 は ImGuiKey_Keyboard_1 などと同じ意味です。
+			// ImGuiKey_0 から ImGuiKey_9 が数字キーに対応します。
+			// ImGuiKey_A から ImGuiKey_Z がアルファベットキーに対応します。
+			// ImGuiKey_Alpha1 は数字の '1' キーに対応しています。
+			// より正確には ImGuiKey_Keyboard_1 を使います。
+			ImGuiKey key = (ImGuiKey)(ImGuiKey_0 + i);
+			if (ImGui::IsKeyPressed(key))
+			{
+				int targetWidth = i;
+
+				bool canResize = !std::any_of(context.selectedNotes.begin(), context.selectedNotes.end(), [&](int id)
+				{
+					Note& n = context.score.notes.at(id);
+					return (targetWidth < MIN_NOTE_WIDTH || (n.lane + targetWidth - 1) > MAX_LANE);
+				});
+
+				if (canResize)
+				{
+					for (int id : context.selectedNotes)
+					{
+						Note& n = context.score.notes.at(id);
+						
+						int resize = std::clamp(targetWidth, MIN_NOTE_WIDTH, MAX_NOTE_WIDTH - (n.lane - 1));
+						//位置をずらそうと思ったが色々考慮がいるのでやめる
+						//if (resize > n.width) {
+						//	int addWidth = resize - n.width;
+						//	int pos = addWidth / 2;
+						//	n.lane = n.lane - pos;
+						//}
+						n.width = resize;					}
+				}
+			}
+		}
+
+
 		// Move
 		if (noteControl(context, pos, sz, "M", ImGuiMouseCursor_ResizeAll))
 		{
