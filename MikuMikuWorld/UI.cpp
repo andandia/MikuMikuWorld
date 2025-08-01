@@ -323,6 +323,7 @@ namespace MikuMikuWorld
 		if (UI::transparentButton(ICON_FA_SEARCH_MINUS, UI::btnSmall, true, value > min))
 		{
 			value -= 0.25f;
+			value = roundf(value * 4.0f) / 4.0f;
 			act = true;
 		}
 
@@ -335,6 +336,7 @@ namespace MikuMikuWorld
 		if (UI::transparentButton(ICON_FA_SEARCH_PLUS, UI::btnSmall, true, value < max))
 		{
 			value += 0.25f;
+			value = roundf(value * 4.0f) / 4.0f;
 			act = true;
 		}
 		ImGui::PopButtonRepeat();
