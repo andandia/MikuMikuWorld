@@ -339,7 +339,9 @@ namespace MikuMikuWorld
 		{
 			context.score.metadata = context.workingData.toScoreMetadata();
 			serializeScore(context.score, filename);
-			serializeScoreToJson(context.score, filename + ".json");
+			//ägí£éqçûÇ›Ç»ÇÃÇ≈ÅAä‹Ç‹Ç»Ç¢ÇÊÇ§Ç…ï∂éöóÒÇçÌÇ¡ÇƒÇ©ÇÁägí£éqí«â¡
+			std::string nweFilename = filename.substr(0, filename.length() - 5);
+			serializeScoreToJson(context.score, nweFilename + MMWS_JSON_EXTENSION);
 
 			UI::setWindowTitle(IO::File::getFilename(filename));
 			context.upToDate = true;
