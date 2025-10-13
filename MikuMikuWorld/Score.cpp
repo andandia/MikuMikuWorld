@@ -6,11 +6,15 @@
 #include "Constants.h"
 #include <unordered_set>
 #include <algorithm>
+#include <nlohmann/json.hpp>
+#include <fstream>
 
 using namespace IO;
 
 namespace MikuMikuWorld
 {
+	using json = nlohmann::json;
+
 	enum NoteFlags
 	{
 		NOTE_CRITICAL = 1 << 0,
@@ -398,5 +402,168 @@ namespace MikuMikuWorld
 
 		writer.flush();
 		writer.close();
+	}
+	
+	void serializeScoreToJson(const Score& score, const std::string& filename)
+	{
+        json data;
+
+        const ScoreMetadata& metadata = score.metadata;
+        json metadataJson;
+        metadataJson["title"] = metadata.title;
+        metadataJson["artist"] = metadata.artist;
+        metadataJson["author"] = metadata.author;
+        metadataJson["genre"] = metadata.genre;
+        metadataJson["level"] = metadata.level;
+        metadataJson["movie_name"] = metadata.movie_name;
+        metadataJson["movie_offset"] = metadata.movie_offset;
+        metadataJson["islong"] = metadata.islong;
+        metadataJson["musicFile"] = metadata.musicFile;
+        metadataJson["musicOffset"] = metadata.musicOffset;
+        metadataJson["jacketFile"] = metadata.jacketFile;
+        data["metadata"] = metadataJson;
+
+        json timeSignatures = json::array();
+        for (const auto&[_, timeSignature] : score.timeSignatures)
+        {
+                json tsJson;
+                tsJson["measure"] = timeSignature.measure;
+                tsJson["numerator"] = timeSignature.numerator;
+                tsJson["denominator"] = timeSignature.denominator;
+                timeSignatures.push_back(tsJson);
+        }
+        data["timeSignatures"] = timeSignatures;
+
+        json tempoChanges = json::array();
+        for (const auto& tempo : score.tempoChanges)
+        {
+                json tempoJson;
+                tempoJson["tick"] = tempo.tick;
+                tempoJson["bpm"] = tempo.bpm;
+                tempoChanges.push_back(tempoJson);
+        }
+        data["tempoChanges"] = tempoChanges;
+
+        json hiSpeedChanges = json::array();
+        for (const auto& hiSpeed : score.hiSpeedChanges)
+        {
+                json hiSpeedJson;
+                hiSpeedJson["tick"] = hiSpeed.tick;
+                hiSpeedJson["speed"] = hiSpeed.speed;
+                hiSpeedChanges.push_back(hiSpeedJson);
+        }
+        data["hiSpeedChanges"] = hiSpeedChanges;
+
+        json skills = json::array();
+        for (const auto& skill : score.skills)
+        {
+                json skillJson;
+                skillJson["id"] = skill.ID;
+                skillJson["tick"] = skill.tick;
+                skills.push_back(skillJson);
+        }
+        data["skills"] = skills;
+
+        json feverJson;
+        feverJson["startTick"] = score.fever.startTick;
+        feverJson["endTick"] = score.fever.endTick;
+        data["fever"] = feverJson;
+
+        auto noteToJson = [](const Note& note)
+        {
+                json noteJson;
+                noteJson["id"] = note.ID;
+                noteJson["tick"] = note.tick;
+                noteJson["lane"] = note.lane;
+                noteJson["width"] = note.width;
+                noteJson["critical"] = note.critical;
+                noteJson["friction"] = note.friction;
+                noteJson["noteType"] = (int)note.getType();
+                if (!note.hasEase())
+                {
+                        noteJson["flick"] = flickTypes[(int)note.flick];
+                }
+                if (note.parentID != -1)
+                {
+                        noteJson["parentId"] = note.parentID;
+                }
+                return noteJson;
+        };
+
+        json notesArray = json::array();
+        std::vector<const Note*> taps;
+        taps.reserve(score.notes.size());
+        for (const auto&[_, note] : score.notes)
+        {
+                if (note.getType() == NoteType::Tap)
+                {
+                        taps.push_back(&note);
+                }
+        }
+        std::sort(taps.begin(), taps.end(), [](const Note* lhs, const Note* rhs)
+        {
+                if (lhs->tick != rhs->tick)
+                        return lhs->tick < rhs->tick;
+                if (lhs->lane != rhs->lane)
+                        return lhs->lane < rhs->lane;
+                return lhs->ID < rhs->ID;
+        });
+        for (const Note* note : taps)
+        {
+                notesArray.push_back(noteToJson(*note));
+        }
+        data["notes"] = notesArray;
+
+        json holdsArray = json::array();
+        std::vector<const HoldNote*> holdList;
+        holdList.reserve(score.holdNotes.size());
+        for (const auto&[_, hold] : score.holdNotes)
+        {
+                holdList.push_back(&hold);
+        }
+        std::sort(holdList.begin(), holdList.end(), [&score](const HoldNote* lhs, const HoldNote* rhs)
+        {
+                const Note& lhsStart = score.notes.at(lhs->start.ID);
+                const Note& rhsStart = score.notes.at(rhs->start.ID);
+                if (lhsStart.tick != rhsStart.tick)
+                        return lhsStart.tick < rhsStart.tick;
+                if (lhsStart.lane != rhsStart.lane)
+                        return lhsStart.lane < rhsStart.lane;
+                return lhsStart.ID < rhsStart.ID;
+        });
+        for (const HoldNote* hold : holdList)
+        {
+                json holdJson;
+                const Note& start = score.notes.at(hold->start.ID);
+                json startJson = noteToJson(start);
+                startJson["ease"] = easeTypes[(int)hold->start.ease];
+                startJson["holdType"] = holdTypes[(int)hold->startType];
+                holdJson["start"] = startJson;
+
+                json stepsJson = json::array();
+                for (const auto& step : hold->steps)
+                {
+                        const Note& mid = score.notes.at(step.ID);
+                        json stepJson = noteToJson(mid);
+                        stepJson["stepType"] = stepTypes[(int)step.type];
+                        stepJson["ease"] = easeTypes[(int)step.ease];
+                        stepsJson.push_back(stepJson);
+                }
+                holdJson["steps"] = stepsJson;
+
+                const Note& end = score.notes.at(hold->end);
+                json endJson = noteToJson(end);
+                endJson["holdType"] = holdTypes[(int)hold->endType];
+                holdJson["end"] = endJson;
+
+                holdsArray.push_back(holdJson);
+        }
+        data["holds"] = holdsArray;
+
+        std::ofstream output(filename);
+        if (!output.is_open())
+                return;
+
+        output << data.dump(4);
 	}
 }
