@@ -693,6 +693,73 @@ namespace MikuMikuWorld
 				timeline.changeMode((TimelineMode)i, edit);
 		}
 
+		// section control
+		ImGui::SameLine();
+		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+		ImGui::SameLine();
+
+		int currentMeasure = accumulateMeasures(context.currentTick, TICKS_PER_BEAT, context.score.timeSignatures);
+
+		if (UI::toolbarButton(ICON_FA_CHEVRON_LEFT, getString("prev_section"), ""))
+		{
+			auto it = context.score.sections.lower_bound(currentMeasure);
+			if (it != context.score.sections.begin())
+			{
+				--it;
+				context.currentTick = measureToTicks(it->first, TICKS_PER_BEAT, context.score.timeSignatures);
+			}
+		}
+
+		std::string sectionName = "";
+		auto sectionIt = context.score.sections.upper_bound(currentMeasure);
+		if (sectionIt != context.score.sections.begin())
+		{
+			auto prevIt = std::prev(sectionIt);
+			sectionName = prevIt->second;
+		}
+
+		ImGui::PushItemWidth(150.0f);
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (ImGui::GetContentRegionMax().y - ImGui::GetCursorPosY() - ImGui::GetFrameHeight()) / 2.0f);
+
+		static char sectionNameBuf[256];
+		static int activeMeasure = -1;
+
+		if (ImGui::GetFocusID() != ImGui::GetID("##section_name"))
+		{
+			strcpy(sectionNameBuf, sectionName.c_str());
+		}
+
+		if (ImGui::InputText("##section_name", sectionNameBuf, sizeof(sectionNameBuf), ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			std::string newName(sectionNameBuf);
+			Score prevScore = context.score;
+			if (newName.empty())
+			{
+				if (context.score.sections.find(currentMeasure) != context.score.sections.end())
+				{
+					context.score.sections.erase(currentMeasure);
+					context.pushHistory("Delete section", prevScore, context.score);
+				}
+			}
+			else
+			{
+				context.score.sections[currentMeasure] = newName;
+				context.pushHistory("Set section", prevScore, context.score);
+			}
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip(getString("section_tooltip"));
+		ImGui::PopItemWidth();
+
+		if (UI::toolbarButton(ICON_FA_CHEVRON_RIGHT, getString("next_section"), ""))
+		{
+			auto it = context.score.sections.upper_bound(currentMeasure);
+			if (it != context.score.sections.end())
+			{
+				context.currentTick = measureToTicks(it->first, TICKS_PER_BEAT, context.score.timeSignatures);
+			}
+		}
+
 		ImGui::PopStyleColor(3);
 		ImGui::PopStyleVar(2);
 		ImGui::End();

@@ -53,6 +53,7 @@ namespace MikuMikuWorld
 		std::vector<HiSpeedChange> hiSpeedChanges;
 		std::vector<SkillTrigger> skills;
 		Fever fever;
+		std::map<int, std::string> sections;
 
 		Score();
 	};

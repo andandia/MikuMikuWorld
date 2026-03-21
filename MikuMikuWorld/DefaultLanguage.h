@@ -201,6 +201,9 @@ namespace MikuMikuWorld
 		{"timeline_time_signature", "Timeline - Insert Time Signature"},
 		{"timeline_hi_speed", "Timeline - Insert Hi-Speed Change"},
 		{"zoom_in", "Zoom In"},
-		{"zoom_out", "Zoom Out"}
+		{"zoom_out", "Zoom Out"},
+		{"prev_section", "Previous Section"},
+		{"next_section", "Next Section"},
+		{"section_tooltip", "Current Section (Press Enter to set for current measure. Clear to remove)"}
 	};
 }
