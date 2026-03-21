@@ -182,6 +182,18 @@ namespace MikuMikuWorld
 			score.fever.startTick = reader->readInt32();
 			score.fever.endTick = reader->readInt32();
 		}
+
+		// sections
+		if (version > 4)
+		{
+			int sectionCount = reader->readInt32();
+			for (int i = 0; i < sectionCount; ++i)
+			{
+				int measure = reader->readInt32();
+				std::string name = reader->readString();
+				score.sections[measure] = name;
+			}
+		}
 	}
 
 	void writeScoreEvents(const Score& score, BinaryWriter* writer)
@@ -216,6 +228,14 @@ namespace MikuMikuWorld
 
 		writer->writeInt32(score.fever.startTick);
 		writer->writeInt32(score.fever.endTick);
+
+		// sections
+		writer->writeInt32(score.sections.size());
+		for (const auto& [measure, name] : score.sections)
+		{
+			writer->writeInt32(measure);
+			writer->writeString(name);
+		}
 	}
 
 	Score deserializeScore(const std::string& filename)
@@ -331,7 +351,7 @@ namespace MikuMikuWorld
 		writer.writeString("MMWS");
 
 		// verison
-		writer.writeInt32(4);
+		writer.writeInt32(5);
 
 		// offsets address in order: metadata -> events -> taps -> holds
 		uint32_t offsetsAddress = writer.getStreamPosition();
@@ -468,6 +488,16 @@ namespace MikuMikuWorld
         feverJson["startTick"] = score.fever.startTick;
         feverJson["endTick"] = score.fever.endTick;
         data["fever"] = feverJson;
+
+        json sections = json::array();
+        for (const auto& [measure, name] : score.sections)
+        {
+                json sectionJson;
+                sectionJson["measure"] = measure;
+                sectionJson["name"] = name;
+                sections.push_back(sectionJson);
+        }
+        data["sections"] = sections;
 
         auto noteToJson = [](const Note& note)
         {

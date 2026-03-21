@@ -202,3 +202,6 @@ timeline_hi_speed, タイムライン「ハイスピード」
 timeline_toggle, タイムライン「選択に一時切り替え」
 zoom_in, ズームイン
 zoom_out, ズームアウト
+prev_section,前のセクション
+next_section,次のセクション
+section_tooltip,現在のセクション (Enterで現在の小節に設定、空にしてEnterで削除)
