@@ -698,6 +698,26 @@ namespace MikuMikuWorld
 		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
 		ImGui::SameLine();
 
+		struct SectionOption
+		{
+			int sortKey;
+			const char* name;
+		};
+
+		static const SectionOption sectionOptions[] = {
+			{0, ""}, // 未設定
+			{1, "Special"},
+			{2, "Intro"},
+			{3, "Outro"},
+			{4, "Phrase A"},
+			{5, "Phrase B"},
+			{6, "Phrase C"},
+			{7, "Phrase D"},
+			{8, "Phrase E"},
+			{9, "Phrase F"},
+			{10, "Phrase G"}
+		};
+
 		int currentMeasure = accumulateMeasures(context.currentTick, TICKS_PER_BEAT, context.score.timeSignatures);
 
 		if (UI::toolbarButton(ICON_FA_CHEVRON_LEFT, getString("prev_section"), ""))
@@ -721,31 +741,38 @@ namespace MikuMikuWorld
 		ImGui::PushItemWidth(150.0f);
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (ImGui::GetContentRegionMax().y - ImGui::GetCursorPosY() - ImGui::GetFrameHeight()) / 2.0f);
 
-		static char sectionNameBuf[256];
-		static int activeMeasure = -1;
+		const char* previewValue = sectionName.empty() ? getString("not_set") : sectionName.c_str();
 
-		if (ImGui::GetFocusID() != ImGui::GetID("##section_name"))
+		if (ImGui::BeginCombo("##section_name", previewValue))
 		{
-			strcpy(sectionNameBuf, sectionName.c_str());
-		}
-
-		if (ImGui::InputText("##section_name", sectionNameBuf, sizeof(sectionNameBuf), ImGuiInputTextFlags_EnterReturnsTrue))
-		{
-			std::string newName(sectionNameBuf);
-			Score prevScore = context.score;
-			if (newName.empty())
+			for (const auto& option : sectionOptions)
 			{
-				if (context.score.sections.find(currentMeasure) != context.score.sections.end())
+				bool isSelected = (sectionName == option.name);
+				const char* displayName = (option.name[0] == '\0') ? getString("not_set") : option.name;
+				if (ImGui::Selectable(displayName, isSelected))
 				{
-					context.score.sections.erase(currentMeasure);
-					context.pushHistory("Delete section", prevScore, context.score);
+					std::string newName(option.name);
+					Score prevScore = context.score;
+					if (newName.empty())
+					{
+						if (context.score.sections.find(currentMeasure) != context.score.sections.end())
+						{
+							context.score.sections.erase(currentMeasure);
+							context.pushHistory("Delete section", prevScore, context.score);
+						}
+					}
+					else
+					{
+						context.score.sections[currentMeasure] = newName;
+						context.pushHistory("Set section", prevScore, context.score);
+					}
+				}
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
 				}
 			}
-			else
-			{
-				context.score.sections[currentMeasure] = newName;
-				context.pushHistory("Set section", prevScore, context.score);
-			}
+			ImGui::EndCombo();
 		}
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip(getString("section_tooltip"));
