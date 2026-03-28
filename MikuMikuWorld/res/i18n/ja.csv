@@ -204,4 +204,5 @@ zoom_in, ズームイン
 zoom_out, ズームアウト
 prev_section,前のセクション
 next_section,次のセクション
-section_tooltip,現在のセクション (Enterで現在の小節に設定、空にしてEnterで削除)
+section_tooltip,現在のセクション (プルダウンから現在の小節に設定、未設定で削除)
+not_set,未設定
