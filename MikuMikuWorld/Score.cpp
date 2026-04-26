@@ -590,9 +590,10 @@ namespace MikuMikuWorld
         }
         data["holds"] = holdsArray;
 
-        std::ofstream output(filename);
-        if (!output.is_open())
-                return;
+		// マルチバイト文字対応のため、ワイド文字列に変換してから開く
+		std::ofstream output(IO::mbToWideStr(filename));
+		if (!output.is_open())
+			throw std::runtime_error("Failed to open JSON file for writing."); // 例外を投げてエラーを通知
 
         output << data.dump(4);
 	}

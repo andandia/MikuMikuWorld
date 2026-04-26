@@ -339,8 +339,8 @@ namespace MikuMikuWorld
 		{
 			context.score.metadata = context.workingData.toScoreMetadata();
 			serializeScore(context.score, filename);
-			//拡張子込みなので、含まないように文字列を削ってから拡張子追加
-			std::string nweFilename = filename.substr(0, filename.length() - 5);
+			// パスと拡張子抜きのファイル名を安全に取得して結合するように修正
+			std::string nweFilename = IO::File::getFilepath(filename) + IO::File::getFilenameWithoutExtension(filename);
 			serializeScoreToJson(context.score, nweFilename + MMWS_JSON_EXTENSION);
 
 			UI::setWindowTitle(IO::File::getFilename(filename));
