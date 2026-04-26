@@ -35,7 +35,7 @@ namespace MikuMikuWorld
 
 	Score ScoreConverter::susToScore(const SUS& sus)
 	{
-		//•¶š—ñ‚©‚çbool‚Ö
+		//æ–‡å­—åˆ—ã‹ã‚‰boolã¸
 		std::string lowerStr = sus.metadata.data.at("islong");
 		std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
 			[](unsigned char c) { return std::tolower(c); });

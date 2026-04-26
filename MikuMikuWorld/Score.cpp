@@ -98,7 +98,7 @@ namespace MikuMikuWorld
 			metadata.movie_offset = 0;
 		}
 		
-		//•¶Žš—ñ‚©‚çbool‚Ö
+		//æ–‡å­—åˆ—ã‹ã‚‰boolã¸
 		std::string lowerStr = reader->readString();
 		std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
 			[](unsigned char c) { return std::tolower(c); });

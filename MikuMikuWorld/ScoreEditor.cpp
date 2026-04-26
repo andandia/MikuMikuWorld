@@ -339,7 +339,7 @@ namespace MikuMikuWorld
 		{
 			context.score.metadata = context.workingData.toScoreMetadata();
 			serializeScore(context.score, filename);
-			//Šg’£q‚İ‚È‚Ì‚ÅAŠÜ‚Ü‚È‚¢‚æ‚¤‚É•¶š—ñ‚ğí‚Á‚Ä‚©‚çŠg’£q’Ç‰Á
+			//æ‹¡å¼µå­è¾¼ã¿ãªã®ã§ã€å«ã¾ãªã„ã‚ˆã†ã«æ–‡å­—åˆ—ã‚’å‰Šã£ã¦ã‹ã‚‰æ‹¡å¼µå­è¿½åŠ 
 			std::string nweFilename = filename.substr(0, filename.length() - 5);
 			serializeScoreToJson(context.score, nweFilename + MMWS_JSON_EXTENSION);
 
