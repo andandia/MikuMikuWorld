@@ -52,26 +52,6 @@ namespace MikuMikuWorld
 		ImGui::Text(str);
 	}
 
-	std::string Utilities::sanitizeFilename(const std::string& str)
-	{
-		std::string result;
-		result.reserve(str.size());
-		for (char c : str)
-		{
-			if (c == '\\' || c == '/' || c == ':' || c == '*' ||
-				c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
-			{
-				continue;
-			}
-			else
-			{
-				result.push_back(c);
-			}
-		}
-
-		return result;
-	}
-
 	void drawShadedText(ImDrawList* drawList, ImVec2 textPos, float fontSize, ImU32 fontColor, const char* text)
 	{
 		if (!drawList) return;

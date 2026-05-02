@@ -26,7 +26,6 @@ namespace MikuMikuWorld
 		static float centerImGuiItem(const float width);
 		static void ImGuiCenteredText(const std::string& str);
 		static void ImGuiCenteredText(const char* str);
-		static std::string sanitizeFilename(const std::string& str);
 	};
 
 	enum class ResultStatus

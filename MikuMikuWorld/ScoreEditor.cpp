@@ -368,7 +368,17 @@ namespace MikuMikuWorld
 		fileDialog.filters = { { "MikuMikuWorld Score", "*.mmws"} };
 		fileDialog.defaultExtension = "mmws";
 		fileDialog.parentWindowHandle = Application::windowState.windowHandle;
-		fileDialog.inputFilename = IO::File::getFilenameWithoutExtension(context.workingData.filename);
+
+		std::string defaultFilename = "";
+		if (!context.workingData.filename.empty())
+		{
+			defaultFilename = IO::File::getFilenameWithoutExtension(context.workingData.filename);
+		}
+		else if (!context.workingData.title.empty())
+		{
+			defaultFilename = Utilities::sanitizeFilename(context.workingData.title);
+		}
+		fileDialog.inputFilename = defaultFilename;
 
 		if (fileDialog.saveFile() == IO::FileDialogResult::OK)
 		{
@@ -433,6 +443,21 @@ namespace MikuMikuWorld
 		fileDialog.filters = { { "Sliding Universal Score", "*.sus" } };
 		fileDialog.defaultExtension = "sus";
 		fileDialog.parentWindowHandle = Application::windowState.windowHandle;
+
+		std::string defaultFilename = "";
+		if (!context.workingData.susfilename.empty())
+		{
+			defaultFilename = IO::File::getFilenameWithoutExtension(context.workingData.susfilename);
+		}
+		else if (!context.workingData.filename.empty())
+		{
+			defaultFilename = IO::File::getFilenameWithoutExtension(context.workingData.filename);
+		}
+		else if (!context.workingData.title.empty())
+		{
+			defaultFilename = Utilities::sanitizeFilename(context.workingData.title);
+		}
+		fileDialog.inputFilename = defaultFilename;
 
 		if (fileDialog.saveFile() == IO::FileDialogResult::OK)
 		{
