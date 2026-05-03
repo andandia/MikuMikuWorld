@@ -77,6 +77,9 @@ background_image, 背景画像
 draw_background, 背景画像を描く
 background_brightnes, 背景の明るさ
 lanes_opacity, レーンの不透明度
+lane_emphasis, レーン強調
+lane_emphasis_2, 2レーンごと
+lane_emphasis_3, 3レーンごと
 video, 画面
 vsync_enable, VSync（垂直同期）
 notes_se, ノーツのSE
