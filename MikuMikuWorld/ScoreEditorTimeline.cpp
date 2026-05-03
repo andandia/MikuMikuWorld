@@ -469,7 +469,7 @@ namespace MikuMikuWorld
 		for (int l = 0; l <= NUM_LANES; ++l)
 		{
 			const int x = position.x + laneToPosition(l);
-			const bool boldLane = !(l & 1);
+			const bool boldLane = (l > 0) && (l % config.laneEmphasis == 0);
 			drawList->AddLine(ImVec2(x, position.y), ImVec2(x, position.y + size.y), boldLane ? divColor1 : divColor2, boldLane ? primaryLineThickness : secondaryLineThickness);
 		}
 

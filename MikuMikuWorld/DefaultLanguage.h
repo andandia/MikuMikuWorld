@@ -82,6 +82,9 @@ namespace MikuMikuWorld
 		{"draw_background", "Draw Background Image"},
 		{"background_brightnes", "Background Brightness"},
 		{"lanes_opacity", "Lanes Opacity"},
+		{"lane_emphasis", "Lane Emphasis"},
+		{"lane_emphasis_2", "Every 2 lanes"},
+		{"lane_emphasis_3", "Every 3 lanes"},
 		{"video", "Video"},
 		{"notes_se", "Notes SE"},
 

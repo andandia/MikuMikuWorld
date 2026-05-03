@@ -92,6 +92,7 @@ namespace MikuMikuWorld
 		bool returnToLastSelectedTickOnPause;
 		bool followCursorInPlayback;
 		bool drawWaveform;
+		int laneEmphasis;
 		bool autoSaveEnabled;
 		int autoSaveInterval;
 		int autoSaveMaxCount;

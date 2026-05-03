@@ -584,6 +584,15 @@ namespace MikuMikuWorld
 			ImGui::MenuItem(getString("return_to_last_tick"), ToShortcutString(config.input.returnToLastSelectedTickOnPause), &config.returnToLastSelectedTickOnPause);
 			ImGui::MenuItem(getString("draw_waveform"), NULL, &config.drawWaveform);
 
+			if (ImGui::BeginMenu(getString("lane_emphasis")))
+			{
+				if (ImGui::MenuItem(getString("lane_emphasis_2"), NULL, config.laneEmphasis == 2))
+					config.laneEmphasis = 2;
+				if (ImGui::MenuItem(getString("lane_emphasis_3"), NULL, config.laneEmphasis == 3))
+					config.laneEmphasis = 3;
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenu();
 		}
 
