@@ -424,6 +424,214 @@ namespace MikuMikuWorld
 		writer.close();
 	}
 	
+	template <typename T>
+	T findEnumIndex(const std::string& value, const char* const* array, size_t size)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			if (value == array[i])
+				return static_cast<T>(i);
+		}
+		return static_cast<T>(0); // fallback
+	}
+
+	Score deserializeScoreFromJson(const std::string& filename)
+	{
+#if defined(_WIN32)
+		std::ifstream input(IO::mbToWideStr(filename).c_str());
+#else
+		std::ifstream input(filename);
+#endif
+		if (!input.is_open())
+			throw std::runtime_error("Failed to open JSON file for reading.");
+
+		json data;
+		try
+		{
+			input >> data;
+		}
+		catch (const json::parse_error& e)
+		{
+			throw std::runtime_error(std::string("JSON parse error: ") + e.what());
+		}
+
+		Score score;
+
+		if (data.contains("metadata"))
+		{
+			const json& metadataJson = data["metadata"];
+			score.metadata.title = metadataJson.value("title", "");
+			score.metadata.artist = metadataJson.value("artist", "");
+			score.metadata.author = metadataJson.value("author", "");
+			score.metadata.genre = metadataJson.value("genre", "");
+			score.metadata.level = metadataJson.value("level", 0);
+			score.metadata.movie_name = metadataJson.value("movie_name", "");
+			score.metadata.islong = metadataJson.value("islong", false);
+			score.metadata.musicFile = metadataJson.value("musicFile", "");
+			score.metadata.musicOffset = metadataJson.value("musicOffset", 0.0f);
+			score.metadata.jacketFile = metadataJson.value("jacketFile", "");
+		}
+
+		if (data.contains("timeSignatures"))
+		{
+			for (const auto& tsJson : data["timeSignatures"])
+			{
+				TimeSignature ts;
+				ts.measure = tsJson.value("measure", 0);
+				ts.numerator = tsJson.value("numerator", 4);
+				ts.denominator = tsJson.value("denominator", 4);
+				score.timeSignatures[ts.measure] = ts;
+			}
+		}
+
+		if (data.contains("tempoChanges"))
+		{
+			for (const auto& tempoJson : data["tempoChanges"])
+			{
+				Tempo tempo;
+				tempo.tick = tempoJson.value("tick", 0);
+				tempo.bpm = tempoJson.value("bpm", 120.0f);
+				score.tempoChanges.push_back(tempo);
+			}
+		}
+
+		if (data.contains("hiSpeedChanges"))
+		{
+			for (const auto& hiSpeedJson : data["hiSpeedChanges"])
+			{
+				HiSpeedChange hs;
+				hs.tick = hiSpeedJson.value("tick", 0);
+				hs.speed = hiSpeedJson.value("speed", 1.0f);
+				score.hiSpeedChanges.push_back(hs);
+			}
+		}
+
+		if (data.contains("skills"))
+		{
+			for (const auto& skillJson : data["skills"])
+			{
+				SkillTrigger skill;
+				skill.tick = skillJson.value("tick", 0);
+				score.skills.push_back(skill);
+			}
+		}
+
+		if (data.contains("fever"))
+		{
+			const json& feverJson = data["fever"];
+			score.fever.startTick = feverJson.value("startTick", 0);
+			score.fever.endTick = feverJson.value("endTick", 0);
+		}
+
+		if (data.contains("sections"))
+		{
+			for (const auto& sectionJson : data["sections"])
+			{
+				int measure = sectionJson.value("measure", 0);
+				std::string name = sectionJson.value("name", "");
+				score.sections[measure] = name;
+			}
+		}
+
+		auto jsonToNote = [&score](const json& noteJson) -> Note
+		{
+			Note note;
+			note.ID = noteJson.value("id", 0);
+			note.tick = noteJson.value("tick", 0);
+			note.lane = noteJson.value("lane", 0);
+			note.width = noteJson.value("width", 1);
+			note.critical = noteJson.value("critical", false);
+			note.friction = noteJson.value("friction", false);
+			int noteTypeInt = noteJson.value("noteType", 0);
+			Note newNote(static_cast<NoteType>(noteTypeInt), note.tick, note.lane, note.width);
+			newNote.ID = note.ID;
+			newNote.critical = note.critical;
+			newNote.friction = note.friction;
+
+			if (noteJson.contains("flick"))
+			{
+				newNote.flick = findEnumIndex<FlickType>(noteJson["flick"].get<std::string>(), flickTypes, sizeof(flickTypes)/sizeof(flickTypes[0]));
+			}
+			if (noteJson.contains("parentId"))
+			{
+				newNote.parentID = noteJson.value("parentId", -1);
+			}
+			return newNote;
+		};
+
+		if (data.contains("notes"))
+		{
+			for (const auto& noteJson : data["notes"])
+			{
+				Note note = jsonToNote(noteJson);
+				score.notes[note.ID] = note;
+			}
+		}
+
+		if (data.contains("holds"))
+		{
+			for (const auto& holdJson : data["holds"])
+			{
+				HoldNote hold;
+
+				if (holdJson.contains("start"))
+				{
+					const json& startJson = holdJson["start"];
+					Note startNote = jsonToNote(startJson);
+					score.notes[startNote.ID] = startNote;
+
+					hold.start.ID = startNote.ID;
+					if (startJson.contains("ease"))
+					{
+						hold.start.ease = findEnumIndex<EaseType>(startJson["ease"].get<std::string>(), easeTypes, sizeof(easeTypes)/sizeof(easeTypes[0]));
+					}
+					if (startJson.contains("holdType"))
+					{
+						hold.startType = findEnumIndex<HoldNoteType>(startJson["holdType"].get<std::string>(), holdTypes, sizeof(holdTypes)/sizeof(holdTypes[0]));
+					}
+				}
+
+				if (holdJson.contains("steps"))
+				{
+					for (const auto& stepJson : holdJson["steps"])
+					{
+						Note stepNote = jsonToNote(stepJson);
+						score.notes[stepNote.ID] = stepNote;
+
+						HoldStep step;
+						step.ID = stepNote.ID;
+						if (stepJson.contains("stepType"))
+						{
+							step.type = findEnumIndex<HoldStepType>(stepJson["stepType"].get<std::string>(), stepTypes, sizeof(stepTypes)/sizeof(stepTypes[0]));
+						}
+						if (stepJson.contains("ease"))
+						{
+							step.ease = findEnumIndex<EaseType>(stepJson["ease"].get<std::string>(), easeTypes, sizeof(easeTypes)/sizeof(easeTypes[0]));
+						}
+						hold.steps.push_back(step);
+					}
+				}
+
+				if (holdJson.contains("end"))
+				{
+					const json& endJson = holdJson["end"];
+					Note endNote = jsonToNote(endJson);
+					score.notes[endNote.ID] = endNote;
+
+					hold.end = endNote.ID;
+					if (endJson.contains("holdType"))
+					{
+						hold.endType = findEnumIndex<HoldNoteType>(endJson["holdType"].get<std::string>(), holdTypes, sizeof(holdTypes)/sizeof(holdTypes[0]));
+					}
+				}
+
+				score.holdNotes[hold.start.ID] = hold;
+			}
+		}
+
+		return score;
+	}
+
 	void serializeScoreToJson(const Score& score, const std::string& filename)
 	{
         json data;
