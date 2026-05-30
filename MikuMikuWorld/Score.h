@@ -59,6 +59,7 @@ namespace MikuMikuWorld
 	};
 
 	Score deserializeScore(const std::string& filename);
+	Score deserializeScoreFromJson(const std::string& filename);
 	void serializeScore(const Score& score, const std::string& filename);
 	void serializeScoreToJson(const Score& score, const std::string& filename);
 }
