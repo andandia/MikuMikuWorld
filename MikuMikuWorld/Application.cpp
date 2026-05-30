@@ -1,4 +1,4 @@
-﻿#include "Application.h"
+#include "Application.h"
 #include "ResourceManager.h"
 #include "IO.h"
 #include "Colors.h"
@@ -153,7 +153,7 @@ namespace MikuMikuWorld
 			std::string extension = IO::File::getFileExtension(*it);
 			std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
 
-			if (extension == SUS_EXTENSION || extension == MMWS_EXTENSION)
+			if (extension == SUS_EXTENSION || extension == MMWS_EXTENSION || extension == MMWS_JSON_EXTENSION)
 				scoreFile = *it;
 			else if (Audio::isSupportedFileFormat(extension))
 				musicFile = *it;

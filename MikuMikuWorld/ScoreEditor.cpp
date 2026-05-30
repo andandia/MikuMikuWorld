@@ -256,6 +256,11 @@ namespace MikuMikuWorld
 				newScore = deserializeScore(filename);
 				workingFilename = filename;
 			}
+			else if (extension == MMWS_JSON_EXTENSION)
+			{
+				newScore = deserializeScoreFromJson(filename);
+				workingFilename = filename;
+			}
 
 			context.clearSelection();
 			context.history.clear();
