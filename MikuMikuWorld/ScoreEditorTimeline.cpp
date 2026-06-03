@@ -2228,21 +2228,38 @@ namespace MikuMikuWorld
 		context.audio.stopMusic();
 	}
 
+	// ノーツの再生効果音（SE）を更新し、適切なタイミングで再生するメソッド
 	void ScoreEditorTimeline::updateNoteSE(ScoreContext& context)
 	{
+		// 再生中でなければ何もしない
 		if (!playing)
+		{
 			return;
+		}
 
+		// 単一のノーツの効果音を再生するための関数
 		static auto singleNoteSEFunc = [&context, this](const Note& note, float notePlayTime)
 		{
 			bool playSE = true;
 			if (note.getType() == NoteType::Hold)
 			{
-				playSE = context.score.holdNotes.at(note.ID).startType == HoldNoteType::Normal;
+				// ホールドノーツに対応するデータが存在するか確認する
+				auto it = context.score.holdNotes.find(note.ID);
+				if (it == context.score.holdNotes.end())
+				{
+					return;
+				}
+				playSE = it->second.startType == HoldNoteType::Normal;
 			}
 			else if (note.getType() == NoteType::HoldEnd)
 			{
-				playSE = context.score.holdNotes.at(note.parentID).endType == HoldNoteType::Normal;
+				// ホールド終了ノーツの親ホールドが存在するか確認する
+				auto it = context.score.holdNotes.find(note.parentID);
+				if (it == context.score.holdNotes.end())
+				{
+					return;
+				}
+				playSE = it->second.endType == HoldNoteType::Normal;
 			}
 
 			if (playSE)
@@ -2257,9 +2274,24 @@ namespace MikuMikuWorld
 			}
 		};
 
+		// ホールドノーツの継続的な接続音を再生するための関数
 		static auto holdNoteSEFunc = [&context, this](const Note& note, float startTime)
 		{
-			int endTick = context.score.notes.at(context.score.holdNotes.at(note.ID).end).tick;
+			// ホールドノーツが存在することを確認する
+			auto holdIt = context.score.holdNotes.find(note.ID);
+			if (holdIt == context.score.holdNotes.end())
+			{
+				return;
+			}
+
+			// 終了ノーツが存在することを確認する
+			auto noteIt = context.score.notes.find(holdIt->second.end);
+			if (noteIt == context.score.notes.end())
+			{
+				return;
+			}
+
+			int endTick = noteIt->second.tick;
 			float endTime = accumulateDuration(endTick, TICKS_PER_BEAT, context.score.tempoChanges);
 
 			float adjustedEndTime = endTime - playStartTime + audioOffsetCorrection;
@@ -2276,22 +2308,42 @@ namespace MikuMikuWorld
 			if (offsetNoteTime >= timeLastFrame && offsetNoteTime < time)
 			{
 				singleNoteSEFunc(note, notePlayTime - audioOffsetCorrection);
-				if (note.getType() == NoteType::Hold && !context.score.holdNotes.at(note.ID).isGuide())
-					holdNoteSEFunc(note, notePlayTime - audioOffsetCorrection);
+				if (note.getType() == NoteType::Hold)
+				{
+					// ガイドノーツではないホールド音のみ再生する
+					auto it = context.score.holdNotes.find(note.ID);
+					if (it != context.score.holdNotes.end() && !it->second.isGuide())
+					{
+						holdNoteSEFunc(note, notePlayTime - audioOffsetCorrection);
+					}
+				}
 			}
 			else if (time == playStartTime)
 			{
-				// Playback just started
+				// 再生開始時
 				if (noteTime >= time && offsetNoteTime < time)
-					singleNoteSEFunc(note, notePlayTime);
-
-				// Playback started mid-hold
-				if (note.getType() == NoteType::Hold && !context.score.holdNotes.at(note.ID).isGuide())
 				{
-					int endTick = context.score.notes.at(context.score.holdNotes.at(note.ID).end).tick;
-					float endTime = accumulateDuration(endTick, TICKS_PER_BEAT, context.score.tempoChanges);
-					if ((noteTime - time) <= audioLookAhead && endTime > time)
-						holdNoteSEFunc(note, std::max(0.0f, notePlayTime));
+					singleNoteSEFunc(note, notePlayTime);
+				}
+
+				// ホールドノーツの途中から再生を開始した場合
+				if (note.getType() == NoteType::Hold)
+				{
+					auto it = context.score.holdNotes.find(note.ID);
+					if (it != context.score.holdNotes.end() && !it->second.isGuide())
+					{
+						// 終了ノーツが存在することを確認する
+						auto noteIt = context.score.notes.find(it->second.end);
+						if (noteIt != context.score.notes.end())
+						{
+							int endTick = noteIt->second.tick;
+							float endTime = accumulateDuration(endTick, TICKS_PER_BEAT, context.score.tempoChanges);
+							if ((noteTime - time) <= audioLookAhead && endTime > time)
+							{
+								holdNoteSEFunc(note, std::max(0.0f, notePlayTime));
+							}
+						}
+					}
 				}
 			}
 		}

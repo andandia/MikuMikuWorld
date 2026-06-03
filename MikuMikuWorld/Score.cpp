@@ -629,6 +629,14 @@ namespace MikuMikuWorld
 			}
 		}
 
+		// 読み込んだノーツの中から最大のIDを探索し、次に割り当てるべきID (nextID) を更新する
+		int maxID = 0;
+		for (const auto& [id, note] : score.notes)
+		{
+			maxID = std::max(maxID, id);
+		}
+		nextID = maxID + 1;
+
 		return score;
 	}
 
