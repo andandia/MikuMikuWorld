@@ -827,7 +827,6 @@ namespace MikuMikuWorld
 		}
 
 		ImGui::SameLine();
-		ImGui::SetCursorPosX(ImGui::GetWindowSize().x - UI::toolbarBtnSize.x - ImGui::GetStyle().WindowPadding.x);
 
 		const char* toggleIcon = darkModeToggled ? ICON_FA_TOGGLE_ON : ICON_FA_TOGGLE_OFF;
 		if (UI::toolbarButton(toggleIcon, getString("dark_mode_toggle"), ""))
