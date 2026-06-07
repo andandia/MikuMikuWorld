@@ -145,7 +145,10 @@ namespace MikuMikuWorld
 		}
 
 		this->theme = theme;
-		applyAccentColor(config.accentColor);
+		// Do not unconditionally re-apply config.accentColor here!
+		// It breaks the override in Application::update() which explicitly manages accent color
+		// Apply the current active accent color instead
+		applyAccentColor(accentColor);
 	}
 
 	void ImGuiManager::shutdown()

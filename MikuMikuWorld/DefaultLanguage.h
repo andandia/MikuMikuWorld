@@ -207,6 +207,7 @@ namespace MikuMikuWorld
 		{"zoom_out", "Zoom Out"},
 		{"prev_section", "Previous Section"},
 		{"next_section", "Next Section"},
-		{"section_tooltip", "Current Section (Press Enter to set for current measure. Clear to remove)"}
+		{"section_tooltip", "Current Section (Press Enter to set for current measure. Clear to remove)"},
+		{"dark_mode_toggle", "Toggle Dark Mode"}
 	};
 }
