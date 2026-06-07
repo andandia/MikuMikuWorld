@@ -817,6 +817,8 @@ namespace MikuMikuWorld
 			ImGui::SetTooltip(getString("section_tooltip"));
 		ImGui::PopItemWidth();
 
+		ImGui::SameLine(); // プルダウンの直後に進むボタンを配置するためSameLineを追加
+
 		if (UI::toolbarButton(ICON_FA_CHEVRON_RIGHT, getString("next_section"), ""))
 		{
 			auto it = context.score.sections.upper_bound(currentMeasure);
@@ -826,9 +828,7 @@ namespace MikuMikuWorld
 			}
 		}
 
-		ImGui::SameLine();
-		ImGui::SetCursorPosX(ImGui::GetWindowSize().x - UI::toolbarBtnSize.x - ImGui::GetStyle().WindowPadding.x);
-
+		// 進むボタンのすぐ右にトグルボタンを配置します。
 		const char* toggleIcon = darkModeToggled ? ICON_FA_TOGGLE_ON : ICON_FA_TOGGLE_OFF;
 		if (UI::toolbarButton(toggleIcon, getString("dark_mode_toggle"), ""))
 		{
