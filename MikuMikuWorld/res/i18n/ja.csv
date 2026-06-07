@@ -209,3 +209,4 @@ prev_section,前のセクション
 next_section,次のセクション
 section_tooltip,現在のセクション (プルダウンから現在の小節に設定、未設定で削除)
 not_set,未設定
+dark_mode_toggle,ダークモード切替

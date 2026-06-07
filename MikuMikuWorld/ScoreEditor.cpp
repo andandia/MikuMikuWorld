@@ -826,6 +826,16 @@ namespace MikuMikuWorld
 			}
 		}
 
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetWindowSize().x - UI::toolbarBtnSize.x - ImGui::GetStyle().WindowPadding.x);
+
+		const char* toggleIcon = darkModeToggled ? ICON_FA_TOGGLE_ON : ICON_FA_TOGGLE_OFF;
+		if (UI::toolbarButton(toggleIcon, getString("dark_mode_toggle"), ""))
+		{
+			darkModeToggled = !darkModeToggled;
+			updateToggleMode(darkModeToggled);
+		}
+
 		ImGui::PopStyleColor(3);
 		ImGui::PopStyleVar(2);
 		ImGui::End();
@@ -834,6 +844,14 @@ namespace MikuMikuWorld
 	void ScoreEditor::help()
 	{
 		ShellExecuteW(0, 0, L"https://github.com/crash5band/MikuMikuWorld/wiki", 0, 0, SW_SHOW);
+	}
+
+	void ScoreEditor::updateToggleMode(bool isToggled)
+	{
+		if (toggleThemeCallback)
+		{
+			toggleThemeCallback(isToggled);
+		}
 	}
 
 	void ScoreEditor::autoSave()

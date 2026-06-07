@@ -1,5 +1,6 @@
 #include "ScoreEditorWindows.h"
 #include <future>
+#include <functional>
 
 namespace MikuMikuWorld
 {
@@ -24,6 +25,8 @@ namespace MikuMikuWorld
 		std::string autoSavePath;
 		bool showImGuiDemoWindow;
 
+		bool darkModeToggled{ false };
+
 		bool save(std::string filename);
 		size_t updateRecentFilesList(const std::string& entry);
 
@@ -47,6 +50,11 @@ namespace MikuMikuWorld
 		void drawMenubar();
 		void drawToolbar();
 		void help();
+
+		void updateToggleMode(bool isToggled);
+		bool isDarkModeToggled() const { return darkModeToggled; }
+
+		std::function<void(bool)> toggleThemeCallback;
 
 		inline void loadPresets(std::string path) { presetManager.loadPresets(path); }
 		inline void savePresets(std::string path) { presetManager.savePresets(path); }

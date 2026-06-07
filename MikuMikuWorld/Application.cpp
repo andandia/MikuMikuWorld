@@ -53,6 +53,19 @@ namespace MikuMikuWorld
 		editor = std::make_unique<ScoreEditor>();
 		editor->loadPresets(appDir + "library");
 
+		editor->toggleThemeCallback = [this](bool dark) {
+			if (dark) {
+				imgui->setBaseTheme(BaseTheme::DARK);
+				UI::accentColors[0] = Color{ 0.1f, 0.1f, 0.1f, 1.0f }.toImVec4();
+				imgui->applyAccentColor(0);
+			}
+			else {
+				UI::accentColors[0] = config.userColor.toImVec4();
+				imgui->setBaseTheme(config.baseTheme);
+				imgui->applyAccentColor(config.accentColor);
+			}
+		};
+
 		initialized = true;
 		return Result::Ok();
 	}
@@ -131,7 +144,9 @@ namespace MikuMikuWorld
 		config.vsync = windowState.vsync;
 		config.windowPos = windowState.position;
 		config.windowSize = windowState.size;
-		config.userColor = Color::fromImVec4(UI::accentColors[0]);
+		// DO NOT override config.userColor from UI::accentColors[0] if the override is active
+		if (!editor->isDarkModeToggled())
+			config.userColor = Color::fromImVec4(UI::accentColors[0]);
 
 		editor->writeSettings();
 		config.write(appDir + APP_CONFIG_FILENAME);
@@ -213,14 +228,17 @@ namespace MikuMikuWorld
 
 		imgui->initializeLayout();
 
-		if (config.accentColor != imgui->getAccentColor())
-			imgui->applyAccentColor(config.accentColor);
+		if (!editor->isDarkModeToggled())
+		{
+			if (config.accentColor != imgui->getAccentColor())
+				imgui->applyAccentColor(config.accentColor);
 
-		if (config.userColor != Color::fromImVec4(UI::accentColors[0]) && config.accentColor == 0)
-			imgui->applyAccentColor(config.accentColor);
+			if (config.userColor != Color::fromImVec4(UI::accentColors[0]) && config.accentColor == 0)
+				imgui->applyAccentColor(config.accentColor);
 
-		if (config.baseTheme != imgui->getBaseTheme())
-			imgui->setBaseTheme(config.baseTheme);
+			if (config.baseTheme != imgui->getBaseTheme())
+				imgui->setBaseTheme(config.baseTheme);
+		}
 
 		if ((windowState.closing || windowState.resetting) && !editor->isUpToDate() && !unsavedChangesDialog.open)
 		{
