@@ -209,4 +209,10 @@ prev_section,前のセクション
 next_section,次のセクション
 section_tooltip,現在のセクション (プルダウンから現在の小節に設定、未設定で削除)
 not_set,未設定
-dark_mode_toggle,ダークモード切替
+fit_mode_toggle,フィットモード切替
+fit_straight,ストレート
+fit_jab,ジャブ
+fit_hook,フック
+fit_upper,アッパー
+fit_squat,スクワット
+fit_rush,ラッシュ

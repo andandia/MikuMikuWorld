@@ -94,7 +94,7 @@ namespace MikuMikuWorld
 			for (int id : selectedNotes)
 			{
 				const Note& note = score.notes.at(id);
-				if (note.getType() == NoteType::Hold)
+				if (note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush)
 					holds.insert(note.ID);
 				else if (note.getType() == NoteType::HoldMid || note.getType() == NoteType::HoldEnd)
 					holds.insert(note.parentID);

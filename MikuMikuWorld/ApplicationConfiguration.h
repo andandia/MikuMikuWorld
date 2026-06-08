@@ -53,6 +53,12 @@ namespace MikuMikuWorld
 		MultiInputBinding timelineBpm = { "timeline_bpm", {ImGuiKey_8}, {ImGuiKey_Keypad8} };
 		MultiInputBinding timelineTimeSignature = { "timeline_time_signature", {ImGuiKey_9}, {ImGuiKey_Keypad9} };
 		MultiInputBinding timelineHiSpeed = { "timeline_hi_speed", {ImGuiKey_0}, {ImGuiKey_Keypad0} };
+		MultiInputBinding timelineFitStraight = { "timeline_fit_straight", {} };
+		MultiInputBinding timelineFitJab = { "timeline_fit_jab", {} };
+		MultiInputBinding timelineFitHook = { "timeline_fit_hook", {} };
+		MultiInputBinding timelineFitUpper = { "timeline_fit_upper", {} };
+		MultiInputBinding timelineFitSquat = { "timeline_fit_squat", {} };
+		MultiInputBinding timelineFitRush = { "timeline_fit_rush", {} };
 
 		MultiInputBinding timelineToggle = { "timeline_toggle", {ImGuiKey_E} };
 	};
@@ -160,6 +166,12 @@ namespace MikuMikuWorld
 		&config.input.timelineBpm,
 		&config.input.timelineTimeSignature,
 		&config.input.timelineHiSpeed,
+		&config.input.timelineFitStraight,
+		&config.input.timelineFitJab,
+		&config.input.timelineFitHook,
+		&config.input.timelineFitUpper,
+		&config.input.timelineFitSquat,
+		&config.input.timelineFitRush,
 		&config.input.timelineToggle,
 
 		&config.input.openHelp,

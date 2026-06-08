@@ -26,6 +26,12 @@ namespace MikuMikuWorld
 		&config.input.timelineBpm,
 		&config.input.timelineTimeSignature,
 		&config.input.timelineHiSpeed,
+		&config.input.timelineFitStraight,
+		&config.input.timelineFitJab,
+		&config.input.timelineFitHook,
+		&config.input.timelineFitUpper,
+		&config.input.timelineFitSquat,
+		&config.input.timelineFitRush,
 	};
 
 	constexpr const char* toolbarFlickNames[] =
@@ -256,6 +262,11 @@ namespace MikuMikuWorld
 				newScore = deserializeScore(filename);
 				workingFilename = filename;
 			}
+			else if (extension == FIT_JSON_EXTENSION)
+			{
+				newScore = deserializeScoreFromJson(filename);
+				workingFilename = filename;
+			}
 			else if (extension == MMWS_JSON_EXTENSION)
 			{
 				newScore = deserializeScoreFromJson(filename);
@@ -322,7 +333,7 @@ namespace MikuMikuWorld
 		IO::FileDialog fileDialog{};
 		fileDialog.parentWindowHandle = Application::windowState.windowHandle;
 		fileDialog.title = "Open Score File";
-		fileDialog.filters = { { "Score Files", "*.mmws;*.sus"} };
+		fileDialog.filters = { { "Score Files", "*.mmws;*.sus;*.fit_json"} };
 		
 		if (fileDialog.openFile() == IO::FileDialogResult::OK)
 			loadScore(fileDialog.outputFilename);
@@ -343,10 +354,26 @@ namespace MikuMikuWorld
 		try
 		{
 			context.score.metadata = context.workingData.toScoreMetadata();
-			serializeScore(context.score, filename);
-			// パスと拡張子抜きのファイル名を安全に取得して結合するように修正
-			std::string nweFilename = IO::File::getFilepath(filename) + IO::File::getFilenameWithoutExtension(filename);
-			serializeScoreToJson(context.score, nweFilename + MMWS_JSON_EXTENSION);
+			if (fitModeToggled)
+			{
+				if (IO::File::getFileExtension(filename) == MMWS_EXTENSION)
+				{
+					std::string newFilename = IO::File::getFilepath(filename) + IO::File::getFilenameWithoutExtension(filename) + FIT_JSON_EXTENSION;
+					serializeScoreToJson(context.score, newFilename);
+					context.workingData.filename = newFilename;
+					filename = newFilename;
+				}
+				else
+				{
+					serializeScoreToJson(context.score, filename);
+				}
+			}
+			else
+			{
+				serializeScore(context.score, filename);
+				std::string nweFilename = IO::File::getFilepath(filename) + IO::File::getFilenameWithoutExtension(filename);
+				serializeScoreToJson(context.score, nweFilename + MMWS_JSON_EXTENSION);
+			}
 
 			UI::setWindowTitle(IO::File::getFilename(filename));
 			context.upToDate = true;
@@ -370,8 +397,16 @@ namespace MikuMikuWorld
 	{
 		IO::FileDialog fileDialog{};
 		fileDialog.title = "Save Chart";
-		fileDialog.filters = { { "MikuMikuWorld Score", "*.mmws"} };
-		fileDialog.defaultExtension = "mmws";
+		if (fitModeToggled)
+		{
+			fileDialog.filters = { { "Fit JSON", "*.fit_json" } };
+			fileDialog.defaultExtension = "fit_json";
+		}
+		else
+		{
+			fileDialog.filters = { { "MikuMikuWorld Score", "*.mmws"} };
+			fileDialog.defaultExtension = "mmws";
+		}
 		fileDialog.parentWindowHandle = Application::windowState.windowHandle;
 
 		std::string defaultFilename = "";
@@ -720,16 +755,40 @@ namespace MikuMikuWorld
 
 		UI::toolbarSeparator();
 
-		for (int i = 0; i < arrayLength(timelineModes); ++i)
+		int startMode = fitModeToggled ? (int)TimelineMode::InsertFitStraight : 0;
+		int endMode = fitModeToggled ? (int)TimelineMode::TimelineModeMax : (int)TimelineMode::InsertHiSpeed + 1;
+		if (!fitModeToggled)
 		{
-			std::string img{ IO::concat("timeline", timelineModes[i], "_") };
-			if (i == (int)TimelineMode::InsertFlick)
-				img.append(IO::concat("", toolbarFlickNames[(int)edit.flickType], "_"));
-			else if (i == (int)TimelineMode::InsertLongMid)
-				img.append(IO::concat("", toolbarStepNames[(int)edit.stepType], "_"));
+			for (int i = startMode; i < endMode; ++i)
+			{
+				std::string img{ IO::concat("timeline", timelineModes[i], "_") };
+				if (i == (int)TimelineMode::InsertFlick)
+					img.append(IO::concat("", toolbarFlickNames[(int)edit.flickType], "_"));
+				else if (i == (int)TimelineMode::InsertLongMid)
+					img.append(IO::concat("", toolbarStepNames[(int)edit.stepType], "_"));
 
-			if (UI::toolbarImageButton(img.c_str(), getString(timelineModes[i]), ToShortcutString(*timelineModeBindings[i]), true, (int)timeline.getMode() == i))
-				timeline.changeMode((TimelineMode)i, edit);
+				if (UI::toolbarImageButton(img.c_str(), getString(timelineModes[i]), ToShortcutString(*timelineModeBindings[i]), true, (int)timeline.getMode() == i))
+					timeline.changeMode((TimelineMode)i, edit);
+			}
+		}
+		else
+		{
+			int fitModes[] = {
+				(int)TimelineMode::Select,
+				(int)TimelineMode::InsertFitStraight,
+				(int)TimelineMode::InsertFitJab,
+				(int)TimelineMode::InsertFitHook,
+				(int)TimelineMode::InsertFitUpper,
+				(int)TimelineMode::InsertFitSquat,
+				(int)TimelineMode::InsertFitRush
+			};
+			for (int i = 0; i < arrayLength(fitModes); ++i)
+			{
+				int mode = fitModes[i];
+				std::string img{ IO::concat("timeline", timelineModes[mode], "_") };
+				if (UI::toolbarImageButton(img.c_str(), getString(timelineModes[mode]), ToShortcutString(*timelineModeBindings[mode]), true, (int)timeline.getMode() == mode))
+					timeline.changeMode((TimelineMode)mode, edit);
+			}
 		}
 
 		// section control
@@ -829,11 +888,11 @@ namespace MikuMikuWorld
 		}
 
 		// 進むボタンのすぐ右にトグルボタンを配置します。
-		const char* toggleIcon = darkModeToggled ? ICON_FA_TOGGLE_ON : ICON_FA_TOGGLE_OFF;
-		if (UI::toolbarButton(toggleIcon, getString("dark_mode_toggle"), ""))
+		const char* toggleIcon = fitModeToggled ? ICON_FA_TOGGLE_ON : ICON_FA_TOGGLE_OFF;
+		if (UI::toolbarButton(toggleIcon, getString("fit_mode_toggle"), ""))
 		{
-			darkModeToggled = !darkModeToggled;
-			updateToggleMode(darkModeToggled);
+			fitModeToggled = !fitModeToggled;
+			updateToggleMode(fitModeToggled);
 		}
 
 		ImGui::PopStyleColor(3);
@@ -863,7 +922,8 @@ namespace MikuMikuWorld
 			std::filesystem::create_directory(wAutoSaveDir);
 
 		context.score.metadata = context.workingData.toScoreMetadata();
-		serializeScore(context.score, autoSavePath + "\\mmw_auto_save_" + Utilities::getCurrentDateTime() + MMWS_EXTENSION);
+		if (fitModeToggled) serializeScoreToJson(context.score, autoSavePath + "\\mmw_auto_save_" + Utilities::getCurrentDateTime() + FIT_JSON_EXTENSION);
+		else serializeScore(context.score, autoSavePath + "\\mmw_auto_save_" + Utilities::getCurrentDateTime() + MMWS_EXTENSION);
 
 		// get mmws files
 		int mmwsCount = 0;
@@ -871,7 +931,7 @@ namespace MikuMikuWorld
 		{
 			std::string extension = file.path().extension().string();
 			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-			mmwsCount += extension == MMWS_EXTENSION;
+			mmwsCount += (extension == MMWS_EXTENSION || extension == FIT_JSON_EXTENSION);
 		}
 
 		// delete older files
@@ -892,7 +952,7 @@ namespace MikuMikuWorld
 		{
 			std::string extension = file.path().extension().string();
 			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-			if (extension == MMWS_EXTENSION)
+			if (extension == MMWS_EXTENSION || extension == FIT_JSON_EXTENSION)
 				deleteFiles.push_back(file);
 		}
 

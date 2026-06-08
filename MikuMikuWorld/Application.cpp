@@ -145,7 +145,7 @@ namespace MikuMikuWorld
 		config.windowPos = windowState.position;
 		config.windowSize = windowState.size;
 		// DO NOT override config.userColor from UI::accentColors[0] if the override is active
-		if (!editor->isDarkModeToggled())
+		if (!editor->isFitModeToggled())
 			config.userColor = Color::fromImVec4(UI::accentColors[0]);
 
 		editor->writeSettings();
@@ -168,7 +168,7 @@ namespace MikuMikuWorld
 			std::string extension = IO::File::getFileExtension(*it);
 			std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
 
-			if (extension == SUS_EXTENSION || extension == MMWS_EXTENSION || extension == MMWS_JSON_EXTENSION)
+			if (extension == SUS_EXTENSION || extension == MMWS_EXTENSION || extension == MMWS_JSON_EXTENSION || extension == FIT_JSON_EXTENSION)
 				scoreFile = *it;
 			else if (Audio::isSupportedFileFormat(extension))
 				musicFile = *it;
@@ -228,7 +228,7 @@ namespace MikuMikuWorld
 
 		imgui->initializeLayout();
 
-		if (!editor->isDarkModeToggled())
+		if (!editor->isFitModeToggled())
 		{
 			if (config.accentColor != imgui->getAccentColor())
 				imgui->applyAccentColor(config.accentColor);

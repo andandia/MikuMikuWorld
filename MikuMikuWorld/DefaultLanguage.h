@@ -208,6 +208,12 @@ namespace MikuMikuWorld
 		{"prev_section", "Previous Section"},
 		{"next_section", "Next Section"},
 		{"section_tooltip", "Current Section (Press Enter to set for current measure. Clear to remove)"},
-		{"dark_mode_toggle", "Toggle Dark Mode"}
+		{"fit_mode_toggle", "Toggle Fit Mode"},
+		{"fit_straight", "Straight"},
+		{"fit_jab", "Jab"},
+		{"fit_hook", "Hook"},
+		{"fit_upper", "Upper"},
+		{"fit_squat", "Squat"},
+		{"fit_rush", "Rush"}
 	};
 }

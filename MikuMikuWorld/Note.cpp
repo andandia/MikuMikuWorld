@@ -28,12 +28,12 @@ namespace MikuMikuWorld
 
 	bool Note::isFlick() const
 	{
-		return flick != FlickType::None && type != NoteType::Hold && type != NoteType::HoldMid;
+		return flick != FlickType::None && type != NoteType::Hold && type != NoteType::HoldMid && type != NoteType::FitRush && type != NoteType::FitRushMid;
 	}
 
 	bool Note::hasEase() const
 	{
-		return type == NoteType::Hold || type == NoteType::HoldMid;
+		return type == NoteType::Hold || type == NoteType::HoldMid || type == NoteType::FitRush || type == NoteType::FitRushMid;
 	}
 
 	void resetNextID()
@@ -99,6 +99,7 @@ namespace MikuMikuWorld
 			switch (note.getType())
 			{
 			case NoteType::Hold:
+		case NoteType::FitRush:
 			case NoteType::HoldEnd:
 				index = 2;
 				break;
@@ -153,7 +154,7 @@ namespace MikuMikuWorld
 			{
 				se = note.critical ? SE_CRITICAL_FRICTION : SE_FRICTION;
 			}
-			else if (note.critical && note.getType() == NoteType::Tap)
+			else if (note.critical && (note.getType() == NoteType::Tap || note.getType() == NoteType::FitStraight || note.getType() == NoteType::FitJab || note.getType() == NoteType::FitHook || note.getType() == NoteType::FitUpper || note.getType() == NoteType::FitSquat))
 			{
 				se = SE_CRITICAL_TAP;
 			}

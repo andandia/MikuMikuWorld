@@ -806,7 +806,7 @@ namespace MikuMikuWorld
 		minNoteYDistance = INT_MAX;
 		for (auto& [id, note] : context.score.notes)
 		{
-			if (isNoteVisible(note) && note.getType() == NoteType::Tap)
+			if (isNoteVisible(note) && (note.getType() == NoteType::Tap || note.getType() == NoteType::FitStraight || note.getType() == NoteType::FitJab || note.getType() == NoteType::FitHook || note.getType() == NoteType::FitUpper || note.getType() == NoteType::FitSquat))
 			{
 				updateNote(context, edit, note);
 				drawNote(note, renderer, noteTint);
@@ -899,7 +899,7 @@ namespace MikuMikuWorld
 			context.pasteData.maxLaneOffset);
 
 		for (const auto& [_, note] : context.pasteData.notes)
-			if (note.getType() == NoteType::Tap && isNoteVisible(note, hoverTick))
+			if ((note.getType() == NoteType::Tap || note.getType() == NoteType::FitStraight || note.getType() == NoteType::FitJab || note.getType() == NoteType::FitHook || note.getType() == NoteType::FitUpper || note.getType() == NoteType::FitSquat) && isNoteVisible(note, hoverTick))
 				drawNote(note, renderer, hoverTint, hoverTick, context.pasteData.offsetLane);
 
 		for (const auto& [_, hold] : context.pasteData.holds)
@@ -915,6 +915,13 @@ namespace MikuMikuWorld
 		inputNotes.tap.lane = lane;
 		inputNotes.tap.width = width;
 		inputNotes.tap.tick = tick;
+		if (currentMode == TimelineMode::InsertFitStraight) inputNotes.tap.setType(NoteType::FitStraight);
+		else if (currentMode == TimelineMode::InsertFitJab) inputNotes.tap.setType(NoteType::FitJab);
+		else if (currentMode == TimelineMode::InsertFitHook) inputNotes.tap.setType(NoteType::FitHook);
+		else if (currentMode == TimelineMode::InsertFitUpper) inputNotes.tap.setType(NoteType::FitUpper);
+		else if (currentMode == TimelineMode::InsertFitSquat) inputNotes.tap.setType(NoteType::FitSquat);
+		else inputNotes.tap.setType(NoteType::Tap);
+
 		inputNotes.tap.flick = currentMode == TimelineMode::InsertFlick ? edit.flickType : FlickType::None;
 		inputNotes.tap.critical = currentMode == TimelineMode::MakeCritical;
 		inputNotes.tap.friction = currentMode == TimelineMode::MakeFriction;
@@ -922,6 +929,8 @@ namespace MikuMikuWorld
 		inputNotes.holdStep.lane = lane;
 		inputNotes.holdStep.width = width;
 		inputNotes.holdStep.tick = tick;
+			if (currentMode == TimelineMode::InsertFitRush) inputNotes.holdStep.setType(NoteType::FitRushMid);
+			else inputNotes.holdStep.setType(NoteType::HoldMid);
 
 		if (insertingHold)
 		{
@@ -934,6 +943,9 @@ namespace MikuMikuWorld
 			inputNotes.holdStart.lane = lane;
 			inputNotes.holdStart.width = width;
 			inputNotes.holdStart.tick = tick;
+
+			if (currentMode == TimelineMode::InsertFitRush) { inputNotes.holdStart.setType(NoteType::FitRush); inputNotes.holdEnd.setType(NoteType::FitRushEnd); }
+			else { inputNotes.holdStart.setType(NoteType::Hold); inputNotes.holdEnd.setType(NoteType::HoldEnd); }
 		}
 	}
 
@@ -981,6 +993,7 @@ namespace MikuMikuWorld
 		switch (currentMode)
 		{
 		case TimelineMode::InsertLong:
+		case TimelineMode::InsertFitRush:
 			if (insertingHold)
 			{
 				drawHoldCurve(inputNotes.holdStart, inputNotes.holdEnd, edit.easeType, false, renderer, hoverTint);
@@ -1040,6 +1053,11 @@ namespace MikuMikuWorld
 		switch (currentMode)
 		{
 		case TimelineMode::InsertTap:
+		case TimelineMode::InsertFitStraight:
+		case TimelineMode::InsertFitJab:
+		case TimelineMode::InsertFitHook:
+		case TimelineMode::InsertFitUpper:
+		case TimelineMode::InsertFitSquat:
 		case TimelineMode::MakeCritical:
 		case TimelineMode::MakeFriction:
 		case TimelineMode::InsertFlick:
@@ -1047,6 +1065,7 @@ namespace MikuMikuWorld
 			break;
 
 		case TimelineMode::InsertLong:
+		case TimelineMode::InsertFitRush:
 		case TimelineMode::InsertGuide:
 			insertingHold = true;
 			break;
@@ -1074,7 +1093,8 @@ namespace MikuMikuWorld
 	{
 		if (currentMode == mode)
 		{
-			if (mode == TimelineMode::InsertLongMid)
+			if (mode == TimelineMode::InsertFitRush) { edit.stepType = HoldStepType::Normal; /* FitRush doesn\'t have mid toggles */ }
+			else if (mode == TimelineMode::InsertLongMid)
 			{
 				edit.stepType = (HoldStepType)(((int)edit.stepType + 1) % (int)HoldStepType::HoldStepTypeCount);
 			}
@@ -1427,6 +1447,7 @@ namespace MikuMikuWorld
 					break;
 
 				case TimelineMode::InsertLong:
+		case TimelineMode::InsertFitRush:
 					context.setEase(EaseType::EaseTypeCount);
 					break;
 
@@ -1566,7 +1587,7 @@ namespace MikuMikuWorld
 		}
 		else
 		{
-			drawNote(currentMode == TimelineMode::InsertLong ? inputNotes.holdStart : inputNotes.tap, renderer, hoverTint);
+			drawNote((currentMode == TimelineMode::InsertLong || currentMode == TimelineMode::InsertFitRush) ? inputNotes.holdStart : inputNotes.tap, renderer, hoverTint);
 		}
 	}
 
@@ -2241,7 +2262,7 @@ namespace MikuMikuWorld
 		static auto singleNoteSEFunc = [&context, this](const Note& note, float notePlayTime)
 		{
 			bool playSE = true;
-			if (note.getType() == NoteType::Hold)
+			if (note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush)
 			{
 				// ホールドノーツに対応するデータが存在するか確認する
 				auto it = context.score.holdNotes.find(note.ID);
@@ -2308,7 +2329,7 @@ namespace MikuMikuWorld
 			if (offsetNoteTime >= timeLastFrame && offsetNoteTime < time)
 			{
 				singleNoteSEFunc(note, notePlayTime - audioOffsetCorrection);
-				if (note.getType() == NoteType::Hold)
+				if (note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush)
 				{
 					// ガイドノーツではないホールド音のみ再生する
 					auto it = context.score.holdNotes.find(note.ID);
@@ -2327,7 +2348,7 @@ namespace MikuMikuWorld
 				}
 
 				// ホールドノーツの途中から再生を開始した場合
-				if (note.getType() == NoteType::Hold)
+				if (note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush)
 				{
 					auto it = context.score.holdNotes.find(note.ID);
 					if (it != context.score.holdNotes.end() && !it->second.isGuide())
