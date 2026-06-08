@@ -16,6 +16,12 @@ namespace MikuMikuWorld
 		InsertBPM,
 		InsertTimeSign,
 		InsertHiSpeed,
+		InsertFitStraight,
+		InsertFitJab,
+		InsertFitHook,
+		InsertFitUpper,
+		InsertFitSquat,
+		InsertFitRush,
 		TimelineModeMax
 	};
 
@@ -31,7 +37,13 @@ namespace MikuMikuWorld
 		"guide",
 		"bpm",
 		"time_signature",
-		"hi_speed"
+		"hi_speed",
+		"fit_straight",
+		"fit_jab",
+		"fit_hook",
+		"fit_upper",
+		"fit_squat",
+		"fit_rush"
 	};
 
 	constexpr int divisions[]
@@ -61,6 +73,12 @@ namespace MikuMikuWorld
 		"bpm",
 		"time_signature",
 		"hi_speed",
+		"fit_straight",
+		"fit_jab",
+		"fit_hook",
+		"fit_upper",
+		"fit_squat",
+		"fit_rush",
 		"skill",
 		"fever",
 		"event"

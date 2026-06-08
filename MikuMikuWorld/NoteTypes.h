@@ -9,6 +9,14 @@ namespace MikuMikuWorld
 		Hold,
 		HoldMid,
 		HoldEnd,
+		FitStraight,
+		FitJab,
+		FitHook,
+		FitUpper,
+		FitSquat,
+		FitRush,
+		FitRushMid,
+		FitRushEnd,
 	};
 
 	enum class FlickType : uint8_t

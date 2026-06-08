@@ -12,7 +12,7 @@ namespace jsonIO
 		note.lane = std::clamp(tryGetValue<int>(data, "lane", 0), mmw::MIN_LANE, mmw::MAX_LANE);
 		note.width = std::clamp(tryGetValue<int>(data, "width", 3), mmw::MIN_NOTE_WIDTH, mmw::MAX_NOTE_WIDTH);
 		
-		if (note.getType() != mmw::NoteType::HoldMid)
+		if (note.getType() != mmw::NoteType::HoldMid && note.getType() != mmw::NoteType::FitRushMid)
 		{
 			note.critical = tryGetValue<bool>(data, "critical", false);
 			note.friction = tryGetValue<bool>(data, "friction", false);
@@ -40,8 +40,9 @@ namespace jsonIO
 		data["tick"] = note.tick;
 		data["lane"] = note.lane;
 		data["width"] = note.width;
+		data["type"] = (int)note.getType();
 
-		if (note.getType() != mmw::NoteType::HoldMid)
+		if (note.getType() != mmw::NoteType::HoldMid && note.getType() != mmw::NoteType::FitRushMid)
 		{
 			data["critical"] = note.critical;
 			data["friction"] = note.friction;
@@ -70,15 +71,23 @@ namespace jsonIO
 			switch (note.getType())
 			{
 			case mmw::NoteType::Tap:
+			case mmw::NoteType::FitStraight:
+			case mmw::NoteType::FitJab:
+			case mmw::NoteType::FitHook:
+			case mmw::NoteType::FitUpper:
+			case mmw::NoteType::FitSquat:
 				selectedNotes.insert(note.ID);
 				break;
 
 			case mmw::NoteType::Hold:
+			case mmw::NoteType::FitRush:
 				selectedHolds.insert(note.ID);
 				break;
 
 			case mmw::NoteType::HoldMid:
 			case mmw::NoteType::HoldEnd:
+			case mmw::NoteType::FitRushMid:
+			case mmw::NoteType::FitRushEnd:
 				selectedHolds.insert(note.parentID);
 				break;
 

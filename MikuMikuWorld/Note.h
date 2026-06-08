@@ -80,6 +80,7 @@ namespace MikuMikuWorld
 		FlickType flick{ FlickType::None };
 
 		explicit Note(NoteType _type);
+		void setType(NoteType _type) { type = _type; }
 		explicit Note(NoteType _type, int tick, int lane, int width);
 		Note();
 

@@ -25,7 +25,7 @@ namespace MikuMikuWorld
 		std::string autoSavePath;
 		bool showImGuiDemoWindow;
 
-		bool darkModeToggled{ false };
+		bool fitModeToggled{ false };
 
 		bool save(std::string filename);
 		size_t updateRecentFilesList(const std::string& entry);
@@ -52,7 +52,7 @@ namespace MikuMikuWorld
 		void help();
 
 		void updateToggleMode(bool isToggled);
-		bool isDarkModeToggled() const { return darkModeToggled; }
+		bool isFitModeToggled() const { return fitModeToggled; }
 
 		std::function<void(bool)> toggleThemeCallback;
 

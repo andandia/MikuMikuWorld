@@ -369,7 +369,7 @@ namespace MikuMikuWorld
 		int noteCount = 0;
 		for (const auto&[id, note] : score.notes)
 		{
-			if (note.getType() != NoteType::Tap)
+			if (note.getType() != NoteType::Tap && note.getType() != NoteType::FitStraight && note.getType() != NoteType::FitJab && note.getType() != NoteType::FitHook && note.getType() != NoteType::FitUpper && note.getType() != NoteType::FitSquat)
 				continue;
 
 			writeNote(note, &writer);
@@ -543,6 +543,8 @@ namespace MikuMikuWorld
 			note.critical = noteJson.value("critical", false);
 			note.friction = noteJson.value("friction", false);
 			int noteTypeInt = noteJson.value("noteType", 0);
+			// Support noteType backward compatibility by looking at "type"
+			if (noteJson.contains("type")) noteTypeInt = noteJson["type"].get<int>();
 			Note newNote(static_cast<NoteType>(noteTypeInt), note.tick, note.lane, note.width);
 			newNote.ID = note.ID;
 			newNote.critical = note.critical;
@@ -725,6 +727,7 @@ namespace MikuMikuWorld
                 noteJson["critical"] = note.critical;
                 noteJson["friction"] = note.friction;
                 noteJson["noteType"] = (int)note.getType();
+					noteJson["type"] = (int)note.getType();
                 if (!note.hasEase())
                 {
                         noteJson["flick"] = flickTypes[(int)note.flick];
@@ -741,7 +744,7 @@ namespace MikuMikuWorld
         taps.reserve(score.notes.size());
         for (const auto&[_, note] : score.notes)
         {
-                if (note.getType() == NoteType::Tap)
+                if (note.getType() == NoteType::Tap || note.getType() == NoteType::FitStraight || note.getType() == NoteType::FitJab || note.getType() == NoteType::FitHook || note.getType() == NoteType::FitUpper || note.getType() == NoteType::FitSquat)
                 {
                         taps.push_back(&note);
                 }

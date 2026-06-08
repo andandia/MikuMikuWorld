@@ -31,14 +31,14 @@ namespace MikuMikuWorld
 		taps = std::count_if(score.notes.begin(), score.notes.end(), [](const auto& n)
 		{
 			const Note& note = n.second;
-			return note.getType() == NoteType::Tap && !note.isFlick() && !note.friction;
+			return (note.getType() == NoteType::Tap || note.getType() == NoteType::FitStraight || note.getType() == NoteType::FitJab || note.getType() == NoteType::FitHook || note.getType() == NoteType::FitUpper || note.getType() == NoteType::FitSquat) && !note.isFlick() && !note.friction;
 		});
 
 		holds = std::count_if(score.notes.begin(), score.notes.end(),
-			[](const auto& n) { return n.second.getType() == NoteType::Hold; });
+			[](const auto& n) { return (n.second.getType() == NoteType::Hold || n.second.getType() == NoteType::FitRush); });
 
 		steps = std::count_if(score.notes.begin(), score.notes.end(),
-			[](const auto& n) { return n.second.getType() == NoteType::HoldMid; });
+			[](const auto& n) { return (n.second.getType() == NoteType::HoldMid || n.second.getType() == NoteType::FitRushMid); });
 
 		flicks = std::count_if(score.notes.begin(), score.notes.end(),
 			[](const auto& n) { return n.second.isFlick(); });

@@ -97,7 +97,7 @@ namespace MikuMikuWorld
 		for (int id : selectedNotes)
 		{
 			Note& note = score.notes.at(id);
-			if (note.getType() == NoteType::Hold)
+			if (note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush)
 			{
 				if (ease == EaseType::EaseTypeCount)
 				{
@@ -146,16 +146,16 @@ namespace MikuMikuWorld
 		{
 			// Invisible hold points cannot be trace notes!
 			Note& note = score.notes.at(id);
-			if (note.getType() == NoteType::Tap || note.getType() == NoteType::HoldMid)
+			if (note.getType() == NoteType::Tap || note.getType() == NoteType::FitStraight || note.getType() == NoteType::FitJab || note.getType() == NoteType::FitHook || note.getType() == NoteType::FitUpper || note.getType() == NoteType::FitSquat || note.getType() == NoteType::HoldMid || note.getType() == NoteType::FitRushMid)
 				continue;
 
-			HoldNote& holdNote = score.holdNotes.at(note.getType() == NoteType::Hold ? note.ID : note.parentID);
+			HoldNote& holdNote = score.holdNotes.at((note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush) ? note.ID : note.parentID);
 
 			// For now do not allow changing guides to normal holds or vice versa
 			if (holdNote.isGuide())
 				continue;
 
-			note.getType() == NoteType::Hold ? holdNote.startType = hold : holdNote.endType = hold;
+			(note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush) ? holdNote.startType = hold : holdNote.endType = hold;
 			edit = true;
 		}
 
@@ -173,18 +173,18 @@ namespace MikuMikuWorld
 		for (int id : selectedNotes)
 		{
 			Note& note = score.notes.at(id);
-			if (note.getType() == NoteType::Tap)
+			if (note.getType() == NoteType::Tap || note.getType() == NoteType::FitStraight || note.getType() == NoteType::FitJab || note.getType() == NoteType::FitHook || note.getType() == NoteType::FitUpper || note.getType() == NoteType::FitSquat)
 			{
 				note.critical ^= true;
 			}
-			else if (note.getType() == NoteType::HoldEnd && (note.isFlick() || note.friction))
+			else if ((note.getType() == NoteType::HoldEnd || note.getType() == NoteType::FitRushEnd) && (note.isFlick() || note.friction))
 			{
 				// if the start is critical the entire hold must be critical
 				note.critical = score.notes.at(note.parentID).critical ? true : !note.critical;
 			}
 			else
 			{
-				critHolds.insert(note.getType() == NoteType::Hold ? note.ID : note.parentID);
+				critHolds.insert((note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush) ? note.ID : note.parentID);
 			}
 		}
 
@@ -220,11 +220,11 @@ namespace MikuMikuWorld
 
 			if (note.getType() == NoteType::Hold || note.getType() == NoteType::HoldEnd)
 			{
-				HoldNote& holdNote = score.holdNotes.at(note.getType() == NoteType::Hold ? note.ID : note.parentID);
+				HoldNote& holdNote = score.holdNotes.at((note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush) ? note.ID : note.parentID);
 				if (holdNote.isGuide())
 					continue;
 				
-				if (note.getType() == NoteType::Hold)
+				if (note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush)
 				{
 					holdNote.startType = HoldNoteType::Normal;
 				}
@@ -276,7 +276,7 @@ namespace MikuMikuWorld
 			}
 			else
 			{
-				const HoldNote& hold = score.holdNotes.at(note.getType() == NoteType::Hold ? note.ID : note.parentID);
+				const HoldNote& hold = score.holdNotes.at((note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush) ? note.ID : note.parentID);
 				score.notes.erase(hold.start.ID);
 				score.notes.erase(hold.end);
 
@@ -780,7 +780,7 @@ namespace MikuMikuWorld
 		{
 			const Note& note = score.notes.at(id);
 			if (note.getType() == NoteType::Hold || note.getType() == NoteType::HoldEnd)
-				return !score.holdNotes.at(note.getType() == NoteType::Hold ? note.ID : note.parentID).isGuide();
+				return !score.holdNotes.at((note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush) ? note.ID : note.parentID).isGuide();
 
 			return false;
 		});
