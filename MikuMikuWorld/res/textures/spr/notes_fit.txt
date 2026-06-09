@@ -1,0 +1,32 @@
+# notes_fit_straight_bg (0)
+694,72,256,113
+# notes_fit_jab_bg (1)
+694,72,256,113
+# notes_fit_hook_bg (2)
+694,328,256,113
+# notes_fit_upper_bg (3)
+694,584,256,113
+# notes_fit_squat_bg (4)
+694,840,256,113
+# notes_fit_rush_bg (5)
+694,1096,256,113
+# notes_fit_rush_mid_bg (6)
+694,1096,256,113
+# notes_fit_rush_end_bg (7)
+694,1096,256,113
+# notes_fit_straight_txt (8)
+1027,72,44,113
+# notes_fit_jab_txt (9)
+1027,72,44,113
+# notes_fit_hook_txt (10)
+1017,328,54,113
+# notes_fit_upper_txt (11)
+1017,584,54,113
+# notes_fit_squat_txt (12)
+995,840,97,113
+# notes_fit_rush_txt (13)
+1023,1096,52,113
+# notes_fit_rush_mid_txt (14)
+1023,1096,52,113
+# notes_fit_rush_end_txt (15)
+1023,1096,52,113

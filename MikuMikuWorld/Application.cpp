@@ -14,7 +14,7 @@ namespace MikuMikuWorld
 	std::string Application::pendingLoadScoreFile;
 	WindowState Application::windowState;
 
-	NoteTextures noteTextures{ -1, -1, -1 };
+	NoteTextures noteTextures{ -1, -1, -1, -1 };
 
 	Application::Application() : 
 		initialized{ false }
@@ -55,7 +55,7 @@ namespace MikuMikuWorld
 
 		editor->toggleThemeCallback = [this](bool dark) {
 			if (dark) {
-				UI::accentColors[0] = Color{ 0.1f, 0.1f, 0.1f, 1.0f }.toImVec4();
+				UI::accentColors[0] = Color{ 0.251f, 0.333f, 0.604f, 1.0f }.toImVec4();
 				imgui->applyAccentColor(0);
 			}
 			else {
@@ -335,6 +335,9 @@ namespace MikuMikuWorld
 		ResourceManager::loadTexture(texturesDir + "notes1.png",
 			TextureFilterMode::LinearMipMapLinear, TextureFilterMode::Linear);
 
+		ResourceManager::loadTexture(texturesDir + "notes_fit.png",
+			TextureFilterMode::LinearMipMapLinear, TextureFilterMode::Linear);
+
 		ResourceManager::loadTexture(texturesDir + "longNoteLine.png");
 		ResourceManager::loadTexture(texturesDir + "touchLine_eff.png");
 
@@ -353,9 +356,16 @@ namespace MikuMikuWorld
 		ResourceManager::loadTexture(texturesDir + "timeline_bpm.png");
 		ResourceManager::loadTexture(texturesDir + "timeline_time_signature.png");
 		ResourceManager::loadTexture(texturesDir + "timeline_hi_speed.png");
+		ResourceManager::loadTexture(texturesDir + "timeline_fit_straight.png");
+		ResourceManager::loadTexture(texturesDir + "timeline_fit_hook.png");
+		ResourceManager::loadTexture(texturesDir + "timeline_fit_upper.png");
+		ResourceManager::loadTexture(texturesDir + "timeline_fit_squat.png");
+		ResourceManager::loadTexture(texturesDir + "timeline_fit_rush.png");
+
 
 		// Cache note textures indices
 		noteTextures.notes = ResourceManager::getTexture(NOTES_TEX);
+		noteTextures.notesFit = ResourceManager::getTexture(NOTES_FIT_TEX);
 		noteTextures.holdPath = ResourceManager::getTexture(HOLD_PATH_TEX);
 		noteTextures.touchLine = ResourceManager::getTexture(TOUCH_LINE_TEX);
 

@@ -1623,10 +1623,6 @@ namespace MikuMikuWorld
 			s1 = -1;
 			s2 = 1;
 
-			if (noteTextures.notes == -1)
-				return;
-
-			const Texture& tex = ResourceManager::textures[noteTextures.notes];
 			const Vector2 nodeSz{ notesHeight - 5, notesHeight - 5 };
 			for (int i = 0; i < note.steps.size(); ++i)
 			{
@@ -1650,8 +1646,10 @@ namespace MikuMikuWorld
 					if (note.steps[i].type != HoldStepType::Hidden)
 					{
 						int sprIndex = getNoteSpriteIndex(n3);
-						if (sprIndex > -1 && sprIndex < tex.sprites.size())
+						int texID = n3.isFit() ? noteTextures.notesFit : noteTextures.notes;
+						if (texID != -1 && sprIndex > -1 && sprIndex < ResourceManager::textures[texID].sprites.size())
 						{
+							const Texture& tex = ResourceManager::textures[texID];
 							const Sprite& s = tex.sprites[sprIndex];
 							Vector2 pos{ laneToPosition(n3.lane + offsetLane + (n3.width / 2.0f)), getNoteYPosFromTick(n3.tick + offsetTicks) };
 
@@ -1675,6 +1673,22 @@ namespace MikuMikuWorld
 
 							renderer->drawSprite(pos, 0.0f, nodeSz, AnchorType::MiddleCenter, tex, s.getX(), s.getX() + s.getWidth(),
 								s.getY(), s.getY() + s.getHeight(), tint, 1);
+
+							if (n3.isFit())
+							{
+								int charSprIndex = sprIndex + 8;
+								if (charSprIndex < tex.sprites.size())
+								{
+									const Sprite& s_char = tex.sprites[charSprIndex];
+									float charHeight = nodeSz.y;
+									float charWidth = s_char.getWidth() * (charHeight / s_char.getHeight());
+									Vector2 charSize{ charWidth, charHeight };
+
+									renderer->drawSprite(pos, 0.0f, charSize, AnchorType::MiddleCenter, tex,
+										s_char.getX(), s_char.getX() + s_char.getWidth(),
+										s_char.getY(), s_char.getY() + s_char.getHeight(), tint, 2);
+								}
+							}
 						}
 					}
 				}
@@ -1726,10 +1740,11 @@ namespace MikuMikuWorld
 
 	void ScoreEditorTimeline::drawHoldMid(Note& note, HoldStepType type, Renderer* renderer, const Color& tint)
 	{
-		if (type == HoldStepType::Hidden || noteTextures.notes == -1)
+		int texID = note.isFit() ? noteTextures.notesFit : noteTextures.notes;
+		if (type == HoldStepType::Hidden || texID == -1)
 			return;
 
-		const Texture& tex = ResourceManager::textures[noteTextures.notes];
+		const Texture& tex = ResourceManager::textures[texID];
 		int sprIndex = getNoteSpriteIndex(note);
 		if (sprIndex < 0 || sprIndex >= tex.sprites.size())
 			return;
@@ -1742,6 +1757,22 @@ namespace MikuMikuWorld
 
 		renderer->drawSprite(pos, 0.0f, nodeSz, AnchorType::MiddleCenter,
 			tex, s.getX(), s.getX() + s.getWidth(), s.getY(), s.getY() + s.getHeight(), tint, 1);
+
+		if (note.isFit())
+		{
+			int charSprIndex = sprIndex + 8;
+			if (charSprIndex < tex.sprites.size())
+			{
+				const Sprite& s_char = tex.sprites[charSprIndex];
+				float charHeight = nodeSz.y;
+				float charWidth = s_char.getWidth() * (charHeight / s_char.getHeight());
+				Vector2 charSize{ charWidth, charHeight };
+
+				renderer->drawSprite(pos, 0.0f, charSize, AnchorType::MiddleCenter,
+					tex, s_char.getX(), s_char.getX() + s_char.getWidth(),
+					s_char.getY(), s_char.getY() + s_char.getHeight(), tint, 2);
+			}
+		}
 	}
 
 	void ScoreEditorTimeline::drawOutline(const StepDrawData& data)
@@ -1757,10 +1788,11 @@ namespace MikuMikuWorld
 
 	void ScoreEditorTimeline::drawFlickArrow(const Note& note, Renderer* renderer, const Color& tint, const int offsetTick, const int offsetLane)
 	{
-		if (noteTextures.notes == -1)
+		int texID = note.isFit() ? noteTextures.notesFit : noteTextures.notes;
+		if (texID == -1)
 			return;
 
-		const Texture& tex = ResourceManager::textures[noteTextures.notes];
+		const Texture& tex = ResourceManager::textures[texID];
 		const int sprIndex = getFlickArrowSpriteIndex(note);
 		if (!isArrayIndexInBounds(sprIndex, tex.sprites))
 			return;
@@ -1792,10 +1824,11 @@ namespace MikuMikuWorld
 
 	void ScoreEditorTimeline::drawNote(const Note& note, Renderer* renderer, const Color& tint, const int offsetTick, const int offsetLane)
 	{
-		if (noteTextures.notes == -1)
+		int texID = note.isFit() ? noteTextures.notesFit : noteTextures.notes;
+		if (texID == -1)
 			return;
 
-		const Texture& tex = ResourceManager::textures[noteTextures.notes];
+		const Texture& tex = ResourceManager::textures[texID];
 		const int sprIndex = getNoteSpriteIndex(note);
 		if (!isArrayIndexInBounds(sprIndex, tex.sprites))
 			return;
@@ -1832,6 +1865,27 @@ namespace MikuMikuWorld
 			right - noteSliceWidth, right,
 			s.getY(), s.getY() + s.getHeight(), tint, (int)ZIndex::Note
 		);
+
+		if (note.isFit())
+		{
+			int charSprIndex = sprIndex + 8;
+			if (charSprIndex < tex.sprites.size())
+			{
+				const Sprite& s_char = tex.sprites[charSprIndex];
+				float charHeight = notesHeight;
+				float charWidth = s_char.getWidth() * (charHeight / s_char.getHeight());
+				Vector2 charSize{ charWidth, charHeight };
+
+				float x1 = laneToPosition(note.lane + offsetLane);
+				float x2 = laneToPosition(note.lane + note.width + offsetLane);
+				Vector2 charPos{ midpoint(x1, x2), getNoteYPosFromTick(note.tick + offsetTick) };
+
+				renderer->drawSprite(charPos, 0.0f, charSize, AnchorType::MiddleCenter, tex,
+					s_char.getX(), s_char.getX() + s_char.getWidth(),
+					s_char.getY(), s_char.getY() + s_char.getHeight(), tint, (int)ZIndex::Note + 1
+				);
+			}
+		}
 
 		if (note.friction)
 		{

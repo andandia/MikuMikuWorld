@@ -59,6 +59,7 @@ namespace MikuMikuWorld
 		int notes;
 		int holdPath;
 		int touchLine;
+		int notesFit;
 	};
 
 	extern NoteTextures noteTextures;
@@ -85,6 +86,11 @@ namespace MikuMikuWorld
 		Note();
 
 		constexpr NoteType getType() const { return type; }
+
+		constexpr bool isFit() const
+		{
+			return type >= NoteType::FitStraight && type <= NoteType::FitRushEnd;
+		}
 
 		bool isFlick() const;
 		bool hasEase() const;

@@ -79,6 +79,22 @@ namespace MikuMikuWorld
 
 	int getNoteSpriteIndex(const Note& note)
 	{
+		if (note.isFit())
+		{
+			switch (note.getType())
+			{
+			case NoteType::FitStraight:	return 0;
+			case NoteType::FitJab:		return 1;
+			case NoteType::FitHook:		return 2;
+			case NoteType::FitUpper:	return 3;
+			case NoteType::FitSquat:	return 4;
+			case NoteType::FitRush:		return 5;
+			case NoteType::FitRushMid:	return 6;
+			case NoteType::FitRushEnd:	return 7;
+			default:					return 0;
+			}
+		}
+
 		// default tap
 		int index = 3;
 

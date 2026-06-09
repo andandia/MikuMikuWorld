@@ -17,6 +17,7 @@ namespace MikuMikuWorld
 	constexpr float MAX_BPM							= 10000;
 
 	constexpr const char* NOTES_TEX				= "notes1";
+	constexpr const char* NOTES_FIT_TEX			= "notes_fit";
 	constexpr const char* HOLD_PATH_TEX			= "longNoteLine";
 	constexpr const char* TOUCH_LINE_TEX		= "touchLine_eff";
 
