@@ -776,11 +776,12 @@ namespace MikuMikuWorld
 			int fitModes[] = {
 				(int)TimelineMode::Select,
 				(int)TimelineMode::InsertFitStraight,
-				(int)TimelineMode::InsertFitJab,
 				(int)TimelineMode::InsertFitHook,
 				(int)TimelineMode::InsertFitUpper,
 				(int)TimelineMode::InsertFitSquat,
-				(int)TimelineMode::InsertFitRush
+					(int)TimelineMode::InsertFitRush,
+					(int)TimelineMode::InsertBPM,
+					(int)TimelineMode::InsertTimeSign
 			};
 			for (int i = 0; i < arrayLength(fitModes); ++i)
 			{
