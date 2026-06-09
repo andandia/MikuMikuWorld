@@ -894,6 +894,7 @@ namespace MikuMikuWorld
 		{
 			fitModeToggled = !fitModeToggled;
 			updateToggleMode(fitModeToggled);
+			Application::windowState.resetting = true;
 		}
 
 		ImGui::PopStyleColor(3);
