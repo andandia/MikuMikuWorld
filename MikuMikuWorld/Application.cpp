@@ -55,13 +55,11 @@ namespace MikuMikuWorld
 
 		editor->toggleThemeCallback = [this](bool dark) {
 			if (dark) {
-				imgui->setBaseTheme(BaseTheme::DARK);
 				UI::accentColors[0] = Color{ 0.1f, 0.1f, 0.1f, 1.0f }.toImVec4();
 				imgui->applyAccentColor(0);
 			}
 			else {
 				UI::accentColors[0] = config.userColor.toImVec4();
-				imgui->setBaseTheme(config.baseTheme);
 				imgui->applyAccentColor(config.accentColor);
 			}
 		};
