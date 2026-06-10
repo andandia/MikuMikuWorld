@@ -27,6 +27,7 @@ namespace MikuMikuWorld
 		bool maximized = false;
 		bool closing = false;
 		bool shouldPickScore = false;
+		bool shouldToggleFitMode = false;
 		bool dragDropHandled = true;
 		bool windowDragging = false;
 		float lastDpiScale = 0.0f;

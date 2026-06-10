@@ -52,6 +52,7 @@ namespace MikuMikuWorld
 		void help();
 
 		void updateToggleMode(bool isToggled);
+		void toggleFitMode();
 		bool isFitModeToggled() const { return fitModeToggled; }
 
 		std::function<void(bool)> toggleThemeCallback;

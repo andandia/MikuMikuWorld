@@ -40,7 +40,8 @@ namespace jsonIO
 		data["tick"] = note.tick;
 		data["lane"] = note.lane;
 		data["width"] = note.width;
-		data["type"] = (int)note.getType();
+		data["noteType"] = (int)note.getType();
+			data["type"] = (int)note.getType();
 
 		if (note.getType() != mmw::NoteType::HoldMid && note.getType() != mmw::NoteType::FitRushMid)
 		{
@@ -117,6 +118,7 @@ namespace jsonIO
 			holdStart["tick"] = start.tick - baseTick;
 			holdStart["ease"] = mmw::easeTypes[(int)hold.start.ease];
 			holdStart["type"] = mmw::holdTypes[(int)hold.startType];
+				holdStart["holdType"] = mmw::holdTypes[(int)hold.startType];
 
 			for (auto& step : hold.steps)
 			{
@@ -124,6 +126,7 @@ namespace jsonIO
 				json stepData = noteToJson(mid);
 				stepData["tick"] = mid.tick - baseTick;
 				stepData["type"] = mmw::stepTypes[(int)step.type];
+					stepData["stepType"] = mmw::stepTypes[(int)step.type];
 				stepData["ease"] = mmw::easeTypes[(int)step.ease];
 
 				stepsArray.push_back(stepData);
@@ -132,6 +135,7 @@ namespace jsonIO
 			json holdEnd = noteToJson(end);
 			holdEnd["tick"] = end.tick - baseTick;
 			holdEnd["type"] = mmw::holdTypes[(int)hold.endType];
+				holdEnd["holdType"] = mmw::holdTypes[(int)hold.endType];
 
 			holdData["start"] = holdStart;
 			holdData["steps"] = stepsArray;

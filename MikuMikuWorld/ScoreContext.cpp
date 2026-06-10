@@ -351,7 +351,8 @@ namespace MikuMikuWorld
 		{
 			for (const auto& entry : data["notes"])
 			{
-				Note note = jsonIO::jsonToNote(entry, NoteType::Tap);
+				NoteType type = (NoteType)jsonIO::tryGetValue<int>(entry, "noteType", (int)jsonIO::tryGetValue<int>(entry, "type", (int)NoteType::Tap));
+				Note note = jsonIO::jsonToNote(entry, type);
 				note.ID = baseId++;
 
 				pasteData.notes[note.ID] = note;
@@ -365,11 +366,13 @@ namespace MikuMikuWorld
 				if (!jsonIO::keyExists(entry, "start") || !jsonIO::keyExists(entry, "end"))
 					continue;
 
-				Note start = jsonIO::jsonToNote(entry["start"], NoteType::Hold);
+				NoteType startType = (NoteType)jsonIO::tryGetValue<int>(entry["start"], "noteType", (int)jsonIO::tryGetValue<int>(entry["start"], "type", (int)NoteType::Hold));
+				Note start = jsonIO::jsonToNote(entry["start"], startType);
 				start.ID = baseId++;
 				pasteData.notes[start.ID] = start;
 
-				Note end = jsonIO::jsonToNote(entry["end"], NoteType::HoldEnd);
+				NoteType endType = (NoteType)jsonIO::tryGetValue<int>(entry["end"], "noteType", (int)jsonIO::tryGetValue<int>(entry["end"], "type", (int)NoteType::HoldEnd));
+				Note end = jsonIO::jsonToNote(entry["end"], endType);
 				end.ID = baseId++;
 				end.parentID = start.ID;
 				end.critical = start.critical || ((end.isFlick() || end.friction) && end.critical);
@@ -390,15 +393,16 @@ namespace MikuMikuWorld
 					hold.steps.reserve(entry["steps"].size());
 					for (const auto& step : entry["steps"])
 					{
-						Note mid = jsonIO::jsonToNote(step, NoteType::HoldMid);
+						NoteType midType = (NoteType)jsonIO::tryGetValue<int>(step, "noteType", (int)jsonIO::tryGetValue<int>(step, "type", (int)NoteType::HoldMid));
+							Note mid = jsonIO::jsonToNote(step, midType);
 						mid.critical = start.critical;
 						mid.ID = baseId++;
 						mid.parentID = start.ID;
 						pasteData.notes[mid.ID] = mid;
 
-						std::string midType = jsonIO::tryGetValue<std::string>(step, "type", "normal");
+						std::string midStepType = jsonIO::tryGetValue<std::string>(step, "stepType", jsonIO::tryGetValue<std::string>(step, "type", "normal"));
 						std::string midEase = jsonIO::tryGetValue<std::string>(step, "ease", "linear");
-						int stepTypeIndex = findArrayItem(midType.c_str(), stepTypes, arrayLength(stepTypes));
+						int stepTypeIndex = findArrayItem(midStepType.c_str(), stepTypes, arrayLength(stepTypes));
 						int easeTypeIndex = findArrayItem(midEase.c_str(), easeTypes, arrayLength(stepTypes));
 
 						// Maintain compatibility with old step type names
