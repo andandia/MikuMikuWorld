@@ -93,15 +93,15 @@ namespace MikuMikuWorld
 				if (VerQueryValue(verData, "\\", (VOID FAR * FAR*) & lpBuffer, &size))
 				{
 					if (size)
-					{
+				{
 						VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
 						if (verInfo->dwSignature == 0xfeef04bd)
-						{
+				{
 							major = (verInfo->dwFileVersionMS >> 16) & 0xffff;
 							minor = (verInfo->dwFileVersionMS >> 0) & 0xffff;
 							rev = (verInfo->dwFileVersionLS >> 16) & 0xffff;
-						}
-					}
+				}
+				}
 				}
 			}
 			delete[] verData;
@@ -287,6 +287,7 @@ namespace MikuMikuWorld
 
 				case DialogResult::Cancel:
 					windowState.resetting = shouldPickScore = false;
+					windowState.shouldToggleFitMode = false;
 					pendingLoadScoreFile.clear();
 					break;
 
@@ -298,6 +299,12 @@ namespace MikuMikuWorld
 			// Already saved or clicked save changes or discard changes
 			if (editor->isUpToDate() || (unsavedChangesResult != DialogResult::Cancel && unsavedChangesResult != DialogResult::None))
 			{
+				if (windowState.shouldToggleFitMode)
+				{
+					editor->toggleFitMode();
+					windowState.shouldToggleFitMode = false;
+				}
+
 				if (windowState.shouldPickScore)
 				{
 					editor->open();

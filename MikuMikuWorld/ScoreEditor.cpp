@@ -261,16 +261,19 @@ namespace MikuMikuWorld
 			{
 				newScore = deserializeScore(filename);
 				workingFilename = filename;
+				if (fitModeToggled) toggleFitMode();
 			}
 			else if (extension == FIT_JSON_EXTENSION)
 			{
 				newScore = deserializeScoreFromJson(filename);
 				workingFilename = filename;
+				if (!fitModeToggled) toggleFitMode();
 			}
 			else if (extension == MMWS_JSON_EXTENSION)
 			{
 				newScore = deserializeScoreFromJson(filename);
 				workingFilename = filename;
+				if (fitModeToggled) toggleFitMode();
 			}
 
 			context.clearSelection();
@@ -892,8 +895,7 @@ namespace MikuMikuWorld
 		const char* toggleIcon = fitModeToggled ? ICON_FA_TOGGLE_ON : ICON_FA_TOGGLE_OFF;
 		if (UI::toolbarButton(toggleIcon, getString("fit_mode_toggle"), ""))
 		{
-			fitModeToggled = !fitModeToggled;
-			updateToggleMode(fitModeToggled);
+			Application::windowState.shouldToggleFitMode = true;
 			Application::windowState.resetting = true;
 		}
 
@@ -913,6 +915,12 @@ namespace MikuMikuWorld
 		{
 			toggleThemeCallback(isToggled);
 		}
+	}
+
+	void ScoreEditor::toggleFitMode()
+	{
+		fitModeToggled = !fitModeToggled;
+		updateToggleMode(fitModeToggled);
 	}
 
 	void ScoreEditor::autoSave()

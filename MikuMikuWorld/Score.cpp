@@ -814,6 +814,6 @@ namespace MikuMikuWorld
 		if (!output.is_open())
 			throw std::runtime_error("Failed to open JSON file for writing."); // 例外を投げてエラーを通知
 
-        output << data.dump(4);
+        output << data.dump();
 	}
 }
