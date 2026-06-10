@@ -341,6 +341,7 @@ namespace MikuMikuWorld
 		pasteData.pasting = false;
 	}
 
+	// コピペされたデータを適用するメソッド
 	void ScoreContext::doPasteData(const json& data, bool flip)
 	{
 		int baseId = 0;
@@ -394,7 +395,7 @@ namespace MikuMikuWorld
 					for (const auto& step : entry["steps"])
 					{
 						NoteType midType = (NoteType)jsonIO::tryGetValue<int>(step, "noteType", (int)jsonIO::tryGetValue<int>(step, "type", (int)NoteType::HoldMid));
-							Note mid = jsonIO::jsonToNote(step, midType);
+						Note mid = jsonIO::jsonToNote(step, midType);
 						mid.critical = start.critical;
 						mid.ID = baseId++;
 						mid.parentID = start.ID;
@@ -405,15 +406,21 @@ namespace MikuMikuWorld
 						int stepTypeIndex = findArrayItem(midStepType.c_str(), stepTypes, arrayLength(stepTypes));
 						int easeTypeIndex = findArrayItem(midEase.c_str(), easeTypes, arrayLength(stepTypes));
 
-						// Maintain compatibility with old step type names
+						// 古い形式のステップタイプ名との互換性を維持するための処理
 						if (stepTypeIndex == -1)
 						{
 							stepTypeIndex = 0;
-							if (midType == "invisible") stepTypeIndex = 1;
-							if (midType == "ignored") stepTypeIndex = 2;
+							if (midStepType == "invisible")
+							{
+								stepTypeIndex = 1;
+							}
+							if (midStepType == "ignored")
+							{
+								stepTypeIndex = 2;
+							}
 						}
 
-						// Maintain compatibility with old ease type names
+						// 古い形式のイージング名との互換性を維持するための処理
 						if (easeTypeIndex == -1)
 						{
 							easeTypeIndex = 0;
@@ -425,10 +432,10 @@ namespace MikuMikuWorld
 					}
 				}
 
-				std::string startType = jsonIO::tryGetValue<std::string>(entry["start"], "type", "normal");
-				std::string endType = jsonIO::tryGetValue<std::string>(entry["end"], "type", "normal");
+				std::string startNoteTypeStr = jsonIO::tryGetValue<std::string>(entry["start"], "type", "normal");
+				std::string endNoteTypeStr = jsonIO::tryGetValue<std::string>(entry["end"], "type", "normal");
 
-				if (startType == "guide" || endType == "guide")
+				if (startNoteTypeStr == "guide" || endNoteTypeStr == "guide")
 				{
 					hold.startType = hold.endType = HoldNoteType::Guide;
 					start.friction = end.friction = false;
@@ -436,13 +443,13 @@ namespace MikuMikuWorld
 				}
 				else
 				{
-					if (startType == "hidden")
+					if (startNoteTypeStr == "hidden")
 					{
 						hold.startType = HoldNoteType::Hidden;
 						start.friction = false;
 					}
 
-					if (endType == "hidden")
+					if (endNoteTypeStr == "hidden")
 					{
 						hold.endType = HoldNoteType::Hidden;
 						end.friction = false;
