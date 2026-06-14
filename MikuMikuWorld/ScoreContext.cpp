@@ -23,7 +23,7 @@ namespace MikuMikuWorld
 		for (int id : selectedNotes)
 		{
 			const Note& note = score.notes.at(id);
-			if (note.getType() != NoteType::HoldMid)
+			if (note.getType() != NoteType::HoldMid && note.getType() != NoteType::FitRushMid)
 				continue;
 
 			HoldNote& hold = score.holdNotes.at(note.parentID);
@@ -63,7 +63,7 @@ namespace MikuMikuWorld
 			Note& note = score.notes.at(id);
 			bool canFlick = !note.hasEase();
 
-			if (note.getType() == NoteType::HoldEnd)
+			if (note.getType() == NoteType::HoldEnd || note.getType() == NoteType::FitRushEnd)
 			{
 				canFlick = score.holdNotes.at(note.parentID).endType == HoldNoteType::Normal;
 			}
@@ -110,7 +110,7 @@ namespace MikuMikuWorld
 					score.holdNotes.at(note.ID).start.ease = ease;
 				}
 			}
-			else if (note.getType() == NoteType::HoldMid)
+			else if (note.getType() == NoteType::HoldMid || note.getType() == NoteType::FitRushMid)
 			{
 				HoldNote& hold = score.holdNotes.at(note.parentID);
 				int pos = findHoldStep(hold, id);
@@ -215,7 +215,7 @@ namespace MikuMikuWorld
 		{
 			// Hold steps and invisible hold points cannot be trace notes
 			Note& note = score.notes.at(id);
-			if (note.getType() == NoteType::HoldMid)
+			if (note.getType() == NoteType::HoldMid || note.getType() == NoteType::FitRushMid)
 				continue;
 
 			if (note.getType() == NoteType::Hold || note.getType() == NoteType::HoldEnd)
@@ -260,9 +260,9 @@ namespace MikuMikuWorld
 				continue;
 
 			Note& note = notePos->second;
-			if (note.getType() != NoteType::Hold && note.getType() != NoteType::HoldEnd)
+			if (note.getType() != NoteType::Hold && note.getType() != NoteType::HoldEnd && note.getType() != NoteType::FitRush && note.getType() != NoteType::FitRushEnd)
 			{
-				if (note.getType() == NoteType::HoldMid)
+				if (note.getType() == NoteType::HoldMid || note.getType() == NoteType::FitRushMid)
 				{
 					// find hold step and remove it from the steps data container
 					if (score.holdNotes.find(note.parentID) != score.holdNotes.end())
@@ -776,7 +776,7 @@ namespace MikuMikuWorld
 		const auto& note2 = score.notes.at(*std::next(selectedNotes.begin()));
 		if (note1.tick == note2.tick)
 			return (note1.getType() == NoteType::Hold && note2.getType() == NoteType::HoldEnd) ||
-						 (note1.getType() == NoteType::HoldEnd && note2.getType() == NoteType::Hold);
+			       (note1.getType() == NoteType::HoldEnd && note2.getType() == NoteType::Hold);
 
 		auto noteTickCompareFunc = [](const Note& n1, const Note& n2) { return n1.tick < n2.tick; };
 		Note earlierNote = std::min(note1, note2, noteTickCompareFunc);
@@ -790,7 +790,7 @@ namespace MikuMikuWorld
 		return std::any_of(selectedNotes.begin(), selectedNotes.end(), [this](const int id)
 		{
 			const Note& note = score.notes.at(id);
-			if (note.getType() == NoteType::Hold || note.getType() == NoteType::HoldEnd)
+			if (note.getType() == NoteType::Hold || note.getType() == NoteType::HoldEnd || note.getType() == NoteType::FitRush || note.getType() == NoteType::FitRushEnd)
 				return !score.holdNotes.at((note.getType() == NoteType::Hold || note.getType() == NoteType::FitRush) ? note.ID : note.parentID).isGuide();
 
 			return false;
