@@ -484,15 +484,43 @@ namespace MikuMikuWorld
 			}
 		}
 
-		if (data.contains("tempoChanges"))
+		if (data.contains("tempoChanges") && data["tempoChanges"].is_array())
 		{
+			if (!data["tempoChanges"].empty())
+			{
+				score.tempoChanges.clear();
+			}
+
+			// 同一tickで複数のBPM変更が指定されていた場合、最初以外は無視するためのセット
+			std::unordered_set<int> seenTicks;
 			for (const auto& tempoJson : data["tempoChanges"])
 			{
 				Tempo tempo;
 				tempo.tick = tempoJson.value("tick", 0);
 				tempo.bpm = tempoJson.value("bpm", 120.0f);
+
+				// 既に同じtickのテンポ変更が存在する場合は無視する
+				if (seenTicks.find(tempo.tick) != seenTicks.end())
+				{
+					continue;
+				}
+
+				seenTicks.insert(tempo.tick);
 				score.tempoChanges.push_back(tempo);
 			}
+
+			// 有効なテンポ変更がなかった場合はデフォルトのテンポを追加
+			if (score.tempoChanges.empty())
+			{
+				score.tempoChanges.push_back(Tempo());
+			}
+
+			// tick順にソートする
+			std::stable_sort(score.tempoChanges.begin(), score.tempoChanges.end(),
+				[](const Tempo& a, const Tempo& b)
+				{
+					return a.tick < b.tick;
+				});
 		}
 
 		if (data.contains("hiSpeedChanges"))
@@ -673,8 +701,16 @@ namespace MikuMikuWorld
         data["timeSignatures"] = timeSignatures;
 
         json tempoChanges = json::array();
+        // 同一tickの重複書き出しを防ぐため、最初に出現したtickのみを出力
+        std::unordered_set<int> seenTempoTicks;
         for (const auto& tempo : score.tempoChanges)
         {
+                if (seenTempoTicks.find(tempo.tick) != seenTempoTicks.end())
+                {
+                        continue;
+                }
+                seenTempoTicks.insert(tempo.tick);
+
                 json tempoJson;
                 tempoJson["tick"] = tempo.tick;
                 tempoJson["bpm"] = tempo.bpm;

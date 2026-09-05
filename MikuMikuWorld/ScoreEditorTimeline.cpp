@@ -953,14 +953,28 @@ namespace MikuMikuWorld
 	{
 		if (currentMode == TimelineMode::InsertBPM)
 		{
-			for (const auto& tempo : context.score.tempoChanges)
+			// 既存のBPMが同じtickに存在する場合は新規追加せず、BPM値を上書き更新する
+			for (auto& tempo : context.score.tempoChanges)
+			{
 				if (tempo.tick == hoverTick)
+				{
+					if (tempo.bpm != edit.bpm)
+					{
+						Score prev = context.score;
+						tempo.bpm = edit.bpm;
+						context.pushHistory("Change tempo", prev, context.score);
+					}
 					return;
+				}
+			}
 
 			Score prev = context.score;
 			context.score.tempoChanges.push_back({ hoverTick, edit.bpm });
 			std::sort(context.score.tempoChanges.begin(), context.score.tempoChanges.end(),
-				[](const auto& a, const auto& b) { return a.tick < b.tick; });
+				[](const auto& a, const auto& b)
+				{
+					return a.tick < b.tick;
+				});
 			context.pushHistory("Insert BPM change", prev, context.score);
 		}
 		else if (currentMode == TimelineMode::InsertTimeSign)
