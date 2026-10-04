@@ -743,9 +743,17 @@ namespace MikuMikuWorld
 		int hiSpeed = findHighSpeedChange(context.currentTick, context.score.hiSpeedChanges);
 		float speed = (hiSpeed == -1 ? 1.0f : context.score.hiSpeedChanges[hiSpeed].speed);
 
+		// 音源が読み込まれている場合は総再生時間を取得し、未読み込みの場合は0とする
+		float musicLength = 0.0f;
+		if (context.audio.isMusicInitialized())
+		{
+			musicLength = context.audio.getMusicLength();
+		}
+
 		static char rhythmString[256];
-		snprintf(rhythmString, 256, "  %02d:%02d:%02d  |  %d/%d  |  %g BPM  |  %gx",
+		snprintf(rhythmString, 256, "  %02d:%02d:%02d/%02d:%02d:%02d  |  %d/%d  |  %g BPM  |  %gx",
 			(int)time / 60, (int)time % 60, (int)((time - (int)time) * 100),
+			(int)musicLength / 60, (int)musicLength % 60, (int)((musicLength - (int)musicLength) * 100),
 			ts.numerator, ts.denominator,
 			tempo.bpm,
 			speed
